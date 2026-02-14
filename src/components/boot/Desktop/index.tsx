@@ -182,7 +182,10 @@ const sound = useSoundManager();
       {/* Main Desktop Layout */}
       <div className="w-full max-w-7xl mx-auto">
         {/* Top Bar */}
-        <TopBar setShowSaveMenu={setShowSaveMenu} setShowOnboarding={setShowOnboarding} />
+        <TopBar
+          setShowSaveMenu={setShowSaveMenu}
+          setShowOnboarding={setShowOnboarding}
+        />
 
         {/* Main Content Grid - Stack on mobile, side-by-side on desktop */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
@@ -221,7 +224,7 @@ const sound = useSoundManager();
               transition={{ delay: 0.6 }}
               className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4"
             >
-              {apps.map((app, index) => (
+              {apps.map((app) => (
                 <motion.button
                   key={app.id}
                   initial={{ opacity: 0, scale: 0.8 }}

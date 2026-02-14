@@ -2,7 +2,13 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 // adjust import path if needed
 
-export const TopBar = ({ setShowSaveMenu, setShowOnboarding } : { setShowSaveMenu: React.Dispatch<React.SetStateAction<boolean>>, setShowOnboarding: React.Dispatch<React.SetStateAction<boolean>> }) => {
+export const TopBar = ({
+  setShowSaveMenu,
+  setShowOnboarding,
+} : {
+  setShowSaveMenu: React.Dispatch<React.SetStateAction<boolean>>,
+  setShowOnboarding: React.Dispatch<React.SetStateAction<boolean>>,
+}) => {
 
     const [now, setNow] = useState(new Date());
     const [isMobile, setIsMobile] = useState(false);
