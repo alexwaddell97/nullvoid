@@ -6,7 +6,7 @@ export const TopBar = ({
   setShowSaveMenu,
   setShowOnboarding,
 } : {
-  setShowSaveMenu: React.Dispatch<React.SetStateAction<boolean>>,
+  setShowSaveMenu: (show: boolean) => void,
   setShowOnboarding: React.Dispatch<React.SetStateAction<boolean>>,
 }) => {
 
@@ -73,7 +73,7 @@ export const TopBar = ({
 
                         {/* Save (floppy) */}
                         <button
-                            onClick={() => setShowSaveMenu(prev => !prev)}
+                            onClick={() => setShowSaveMenu(true)}
                             className="text-xs font-semibold text-blue-600 hover:text-blue-400 border border-blue-500/40 px-2 sm:px-3 py-1 rounded transition-colors duration-200 active:scale-95 hover:border-blue-500/70 whitespace-nowrap"
                             title="Save"
                         >
