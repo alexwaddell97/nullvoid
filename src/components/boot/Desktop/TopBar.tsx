@@ -33,7 +33,7 @@ export const TopBar = ({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b border-green-500/20"
+            className="pb-4 px-4 sm:pb-6 border-b border-green-500/20"
         >
             {/* Main header row */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">

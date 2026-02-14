@@ -70,7 +70,7 @@ export const TabBar = ({ onDesktopClick, isDesktopActive }: TabBarProps) => {
   }
 
   return (
-    <div className="bg-gray-900/95 backdrop-blur-sm border-b border-green-500/30 overflow-x-auto scrollbar-thin scrollbar-thumb-green-500/30 scrollbar-track-transparent">
+    <div className=" backdrop-blur-sm border-b border-green-500/30 overflow-x-auto scrollbar-thin scrollbar-thumb-green-500/30 scrollbar-track-transparent">
       <div className="flex items-center gap-1 p-1">
         {/* Desktop/Home tab */}
         <motion.div className="relative flex-shrink-0">
