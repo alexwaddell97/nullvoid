@@ -75,7 +75,11 @@ export const TabBar = ({ onDesktopClick, isDesktopActive }: TabBarProps) => {
         {/* Desktop/Home tab */}
         <motion.div className="relative flex-shrink-0">
           <button
-            onClick={onDesktopClick}
+            onMouseDown={(e) => {
+              if (e.button === 0) {
+                onDesktopClick();
+              }
+            }}
             className={`
               flex items-center gap-2 px-3 py-2 rounded-t-lg transition-all
               min-w-[120px] max-w-[200px] group relative
@@ -88,7 +92,7 @@ export const TabBar = ({ onDesktopClick, isDesktopActive }: TabBarProps) => {
             `}
           >
             <Home size={14} className="flex-shrink-0" />
-            <span className="text-xs font-mono truncate flex-1">Desktop</span>
+            <span className="text-xs font-mono truncate flex-1 uppercase">Desktop</span>
           </button>
 
           {/* Active indicator */}
@@ -132,7 +136,7 @@ export const TabBar = ({ onDesktopClick, isDesktopActive }: TabBarProps) => {
                   <span className="flex-shrink-0 text-sm">{window.icon}</span>
 
                   {/* Title */}
-                  <span className="text-xs font-mono truncate flex-1">
+                  <span className="text-xs font-mono truncate flex-1 uppercase">
                     {window.title}
                   </span>
 
@@ -140,7 +144,7 @@ export const TabBar = ({ onDesktopClick, isDesktopActive }: TabBarProps) => {
                   <button
                     onClick={(e) => handleCloseTab(e, window.id)}
                     className={`
-                      flex-shrink-0 p-0.5 rounded transition-all
+                      flex-shrink-0 p-0.5 rounded transition-all self-start mt-0.5
                       focus:outline-none focus-visible:outline-none
                       ${
                         isActive
