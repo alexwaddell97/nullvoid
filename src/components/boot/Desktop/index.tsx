@@ -15,10 +15,12 @@ import { SaveManager } from '../../SaveManager';
 
 // Import components
 import { useSoundManager } from '../../../hooks/useSoundManager';
+import { useWindowManager } from '../../../stores/WindowManager';
 
 // Import components
 import { HelpModal } from './HelpModal';
 import { TopBar } from './TopBar';
+import { TabBar } from './TabBar';
 
 interface DesktopApp {
   id: string;
@@ -30,13 +32,13 @@ interface DesktopApp {
 }
 
 export const Desktop = () => {
-const sound = useSoundManager();
-  const [openApp, setOpenApp] = useState<string | null>(null);
+  const sound = useSoundManager();
+  const { openWindow, closeWindow, activeWindowId, openWindows, getActiveApp } = useWindowManager();
   const [showOnboarding, setShowOnboarding] = useState(true);
   const [currentObjective] = useState('Investigate your identity');
   const [discoveredClues] = useState<string[]>([]);
   const [isMobile, setIsMobile] = useState(false);
-  const [showSaveMenu, setShowSaveMenu] = useState(false);
+  const [showDesktop, setShowDesktop] = useState(true);
 
   // Detect mobile/tablet
   useEffect(() => {
@@ -111,9 +113,11 @@ const sound = useSoundManager();
   const handleAppClick = (app: DesktopApp) => {
     if (app.locked) {
       console.log('App locked:', app.name);
+      sound.play('errorBeep');
       // TODO: Show locked message/sound effect
     } else {
-      setOpenApp(app.id);
+      openWindow(app.id, app.name, app.icon);
+      setShowDesktop(false);
       // Dismiss onboarding on first app open
       if (showOnboarding) {
         setShowOnboarding(false);
@@ -121,8 +125,20 @@ const sound = useSoundManager();
     }
   };
 
-  const handleCloseApp = () => {
-    setOpenApp(null);
+  const handleCloseApp = (appId?: string) => {
+    // Find the window for this app
+    const window = openWindows.find(w => w.appId === appId);
+    if (window) {
+      closeWindow(window.id);
+      // If no windows left, show desktop
+      if (openWindows.length === 1) {
+        setShowDesktop(true);
+      }
+    }
+  };
+
+  const handleShowDesktop = () => {
+    setShowDesktop(true);
   };
 
   // Story beats and objectives
@@ -132,60 +148,123 @@ const sound = useSoundManager();
     { text: 'Identity Verification: FAILED', color: 'text-red-500' },
   ];
 
-  // Render open app
+  // Get currently active app
+  const activeApp = getActiveApp();
 
-  if (showSaveMenu) {
-    return <SaveManager onClose={() => setShowSaveMenu(false)} />;
-  }
+  // Render active app (if any)
+  const renderActiveApp = () => {
+    if (!activeApp) return null;
 
-  if (openApp === 'terminal') {
-    return <Terminal onClose={handleCloseApp} />;
-  }
-  if (openApp === 'files') {
-    return <FileBrowser onClose={handleCloseApp} />;
-  }
-  if (openApp === 'email') {
-    return <EmailClient onClose={handleCloseApp} />;
-  }
-  if (openApp === 'logs') {
-    return <LogViewer onClose={handleCloseApp} />;
-  }
+    const commonProps = {
+      onClose: () => handleCloseApp(activeApp),
+    };
 
-  if (openApp === 'decrypt') {
-    return <DecryptionTool onClose={handleCloseApp} />;
-  }
+    switch (activeApp) {
+      case 'terminal':
+        return <Terminal {...commonProps} />;
+      case 'files':
+        return <FileBrowser {...commonProps} />;
+      case 'email':
+        return <EmailClient {...commonProps} />;
+      case 'logs':
+        return <LogViewer {...commonProps} />;
+      case 'decrypt':
+        return <DecryptionTool {...commonProps} />;
+      case 'settings':
+        return <SaveManager {...commonProps} />;
+      default:
+        return null;
+    }
+  };
 
-    // Add SaveManager as an app
-  if (openApp === 'settings') {
-    return <SaveManager onClose={handleCloseApp} />;
-  }
-  
-  
-  
+  // Main render
+  return (
+    <div className="h-screen flex flex-col bg-black">
+      {/* Top Bar */}
+      <TopBar
+        setShowSaveMenu={(show) => {
+          if (show) {
+            openWindow('settings', 'SETTINGS', '⚙️');
+            setShowDesktop(false);
+          }
+        }}
+        setShowOnboarding={setShowOnboarding}
+      />
 
+      {/* Tab Bar */}
+      <TabBar
+        onDesktopClick={handleShowDesktop}
+        isDesktopActive={showDesktop}
+      />
 
-  // Desktop view
+      {/* Onboarding Modal */}
+      <AnimatePresence>
+        {showOnboarding && (
+          <HelpModal onClose={() => setShowOnboarding(false)} />
+        )}
+      </AnimatePresence>
+
+      {/* Main Content Area */}
+      <div className="flex-1 overflow-hidden">
+        <AnimatePresence mode="wait">
+          {/* Show active app OR desktop */}
+          {!showDesktop && activeApp ? (
+            <motion.div
+              key={activeWindowId || 'app'}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+              className="h-full"
+            >
+              {renderActiveApp()}
+            </motion.div>
+          ) : (
+            <DesktopView
+              key="desktop"
+              apps={apps}
+              storyBeats={storyBeats}
+              currentObjective={currentObjective}
+              discoveredClues={discoveredClues}
+              isMobile={isMobile}
+              handleAppClick={handleAppClick}
+            />
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+};
+
+// Extracted Desktop view as separate component for cleaner code
+interface DesktopViewProps {
+  apps: DesktopApp[];
+  storyBeats: { text: string; color: string }[];
+  currentObjective: string;
+  discoveredClues: string[];
+  isMobile: boolean;
+  handleAppClick: (app: DesktopApp) => void;
+}
+
+const DesktopView = ({
+  apps,
+  storyBeats,
+  currentObjective,
+  discoveredClues,
+  isMobile,
+  handleAppClick,
+}: DesktopViewProps) => {
+  const sound = useSoundManager();
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="max-h-screen bg-black text-green-400 p-3 sm:p-4 md:p-6"
+      className="h-full overflow-auto bg-black text-green-400 p-3 sm:p-4 md:p-6"
     >
-      {/* Onboarding Modal */}
-      <AnimatePresence>
-        {showOnboarding && (
-            <HelpModal onClose={() => setShowOnboarding(false)} />
-        )}
-      </AnimatePresence>
-
       {/* Main Desktop Layout */}
       <div className="w-full max-w-7xl mx-auto">
-        {/* Top Bar */}
-        <TopBar
-          setShowSaveMenu={setShowSaveMenu}
-          setShowOnboarding={setShowOnboarding}
-        />
 
         {/* Main Content Grid - Stack on mobile, side-by-side on desktop */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
