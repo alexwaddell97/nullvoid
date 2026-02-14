@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { decryptionPuzzles, type DecryptionPuzzle } from '../../data/puzzles';
 import { useGameStore } from '../../stores/GameStore';
+import { Unlock } from 'lucide-react';
 
 interface DecryptionToolProps {
     onClose: () => void;
@@ -356,7 +357,7 @@ export const DecryptionTool = ({ onClose }: DecryptionToolProps) => {
             {/* Header */}
             <div className="flex items-center justify-between p-3 border-b border-green-500/30 bg-green-500/5">
                 <div className="flex items-center gap-2">
-                    <span className="text-lg">🔓</span>
+                    <Unlock size={18} />
                     <span className="text-sm font-semibold">DECRYPTION TOOL</span>
                 </div>
                 <button

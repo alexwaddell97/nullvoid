@@ -6,7 +6,6 @@ import { BIOSScreen } from './components/boot/BIOSScreen';
 import { TerminalLoad } from './components/boot/TerminalLoad';
 import { Desktop } from './components/boot/Desktop';
 import { useSoundManager } from './hooks/useSoundManager';
-import { GlobalNotesButton } from './components/shared/GlobalNotesButton';
 
 
 
@@ -67,9 +66,6 @@ function App() {
         {/* Screen curvature vignette */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
       </div>
-
-      {/* Global Notes Button - Only show after desktop loads */}
-      {bootPhase === 'desktop' && <GlobalNotesButton />}
 
       {/* Boot Sequence */}
       <AnimatePresence mode="wait">

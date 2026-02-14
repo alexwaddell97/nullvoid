@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { fileSystem, type FileItem } from '../../data/files';
 import { useGameStore } from '../../stores/GameStore';
 import { SelectionContextMenu } from '../shared/SelectionContextMenu';
+import { Folder, File, Lock } from 'lucide-react';
 
 interface FileBrowserProps {
   onClose: () => void;
@@ -91,7 +92,7 @@ export const FileBrowser = ({ onClose }: FileBrowserProps) => {
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b border-green-500/30 bg-green-500/5">
         <div className="flex items-center gap-2">
-          <span className="text-lg">📁</span>
+          <Folder size={18} />
           <span className="text-sm font-semibold">FILE BROWSER</span>
         </div>
         <button
@@ -144,10 +145,10 @@ export const FileBrowser = ({ onClose }: FileBrowserProps) => {
                   whileTap={isFileAccessible(item) ? { scale: 0.99 } : {}}
                 >
                   {/* Icon */}
-                  <span className="text-xl">
-                    {!isFileAccessible(item) ? '🔒' : 
-                     item.encrypted && !encryptedFilesDecrypted.has(item.id) ? '🔐' : 
-                     item.type === 'folder' ? '📁' : '📄'}
+                  <span>
+                    {!isFileAccessible(item) ? <Lock size={20} className="text-red-400" /> :
+                     item.encrypted && !encryptedFilesDecrypted.has(item.id) ? <Lock size={20} className="text-amber-400" /> :
+                     item.type === 'folder' ? <Folder size={20} /> : <File size={20} />}
                   </span>
 
                   {/* File info */}
@@ -262,7 +263,7 @@ export const FileBrowser = ({ onClose }: FileBrowserProps) => {
                 className="p-4 h-full flex items-center justify-center"
               >
                 <div className="text-green-700 text-sm text-center">
-                  <div className="text-4xl mb-4">📄</div>
+                  <div className="mb-4"><File size={48} /></div>
                   <div>Select a file to view its contents</div>
                   <div className="text-xs mt-2 text-green-800">
                     {readFiles.size} files read

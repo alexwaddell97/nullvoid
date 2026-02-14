@@ -5,6 +5,7 @@ import { emails, type Email, type Attachment } from '../../data/emails';
 import { useSoundManager } from '../../hooks/useSoundManager';
 import { useGameStore } from '../../stores/GameStore';
 import { SelectionContextMenu } from '../shared/SelectionContextMenu';
+import { Mail, File, FileText, Image, Paperclip } from 'lucide-react';
 
 interface EmailClientProps {
   onClose: () => void;
@@ -129,13 +130,14 @@ const handleEmailClick = (email: Email) => {
   };
 
   const getAttachmentIcon = (type: string) => {
+    const iconSize = 16;
     switch (type) {
-      case 'document': return '📄';
-      case 'image': return '🖼️';
-      case 'audio': return '🔊';
-      case 'video': return '🎬';
-      case 'data': return '📊';
-      default: return '📎';
+      case 'document': return <FileText size={iconSize} />;
+      case 'image': return <Image size={iconSize} />;
+      case 'audio': return <File size={iconSize} />;
+      case 'video': return <File size={iconSize} />;
+      case 'data': return <File size={iconSize} />;
+      default: return <Paperclip size={iconSize} />;
     }
   };
 
@@ -214,7 +216,7 @@ const handleEmailClick = (email: Email) => {
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b border-green-500/30 bg-green-500/5">
         <div className="flex items-center gap-2">
-          <span className="text-lg">✉️</span>
+          <Mail size={18} />
           <span className="text-sm font-semibold">EMAIL CLIENT</span>
         </div>
         <button
@@ -462,7 +464,7 @@ const handleEmailClick = (email: Email) => {
                 className="p-6 h-full flex items-center justify-center"
               >
                 <div className="text-green-700 text-sm text-center">
-                  <div className="text-4xl mb-4">✉️</div>
+                  <div className="mb-4"><Mail size={48} /></div>
                   <div>Select an email to read</div>
                   <div className="text-xs mt-2 text-green-800">
                     {emailList.filter(e => !e.read).length} unread messages

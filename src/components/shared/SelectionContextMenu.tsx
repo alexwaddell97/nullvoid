@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '../../stores/GameStore';
+import { StickyNote } from 'lucide-react';
 
 interface SelectionContextMenuProps {
   children: ReactNode;
@@ -120,7 +121,7 @@ export const SelectionContextMenu = ({
               }}
               className="w-full px-4 py-2 text-left text-xs text-green-400 hover:bg-green-500/10 transition-colors flex items-center gap-2 min-w-[180px]"
             >
-              <span>📝</span>
+              <StickyNote size={16} />
               <div className="flex-1">
                 <div>Add to Notes</div>
                 {source && (
