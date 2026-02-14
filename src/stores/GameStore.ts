@@ -2,37 +2,51 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 // Types
+export interface Note {
+  id: string;
+  title: string;
+  content: string;
+  source?: string; // e.g., "email:email_001", "file:readme", "log:log_001"
+  sourceName?: string; // e.g., "Re: Project Status", "readme.txt", "System Log 001"
+  category?: string;
+  timestamp: number;
+  tags?: string[];
+}
+
 export interface GameProgress {
   // Story progression
   currentObjective: string;
   discoveredClues: string[];
   storyBeats: string[];
-  
+
   // File system
   unlockedFiles: Set<string>;
   readFiles: Set<string>;
   encryptedFilesDecrypted: Set<string>;
-  
+
   // Apps & Systems
   unlockedApps: Set<string>;
   visitedApps: Set<string>;
-  
+
   // Emails
   readEmails: Set<string>;
   unreadEmailCount: number;
-  
+
   // Logs
   viewedLogs: Set<string>;
-  
+
   // Decryption
   solvedPuzzles: Set<string>;
   decryptionAttempts: Record<string, number>;
   hasDecryptKey: boolean;
-  
+
   // Terminal
   commandsUsed: Set<string>;
   currentTerminalPath: string[];
-  
+
+  // Notes
+  notes: Note[];
+
   // Metadata
   gameStartTime: number;
   lastSaveTime: number;
@@ -45,31 +59,37 @@ export interface GameState extends GameProgress {
   setObjective: (objective: string) => void;
   addClue: (clue: string) => void;
   addStoryBeat: (beat: string) => void;
-  
+
   // Actions - Files
   unlockFile: (fileId: string) => void;
   markFileAsRead: (fileId: string) => void;
   decryptFile: (fileId: string) => void;
-  
+
   // Actions - Apps
   unlockApp: (appId: string) => void;
   visitApp: (appId: string) => void;
-  
+
   // Actions - Emails
   markEmailAsRead: (emailId: string) => void;
-  
+
   // Actions - Logs
   markLogAsViewed: (logId: string) => void;
-  
+
   // Actions - Decryption
   solvePuzzle: (puzzleId: string) => void;
   incrementPuzzleAttempts: (puzzleId: string) => void;
   setDecryptKey: (hasKey: boolean) => void;
-  
+
   // Actions - Terminal
   addCommandUsed: (command: string) => void;
   setTerminalPath: (path: string[]) => void;
-  
+
+  // Actions - Notes
+  addNote: (note: Omit<Note, 'id' | 'timestamp'>) => void;
+  updateNote: (id: string, updates: Partial<Note>) => void;
+  deleteNote: (id: string) => void;
+  getNoteById: (id: string) => Note | undefined;
+
   // Actions - Meta
   updatePlayTime: (seconds: number) => void;
   saveGame: () => void;
@@ -89,32 +109,35 @@ const initialState: GameProgress = {
   currentObjective: 'Investigate your identity',
   discoveredClues: [],
   storyBeats: [],
-  
+
   // Files
   unlockedFiles: new Set(['readme', 'project_overview']), // Start with some files unlocked
   readFiles: new Set(),
   encryptedFilesDecrypted: new Set(),
-  
+
   // Apps
   unlockedApps: new Set(['files', 'terminal', 'logs', 'archive']), // Start with basic apps
   visitedApps: new Set(),
-  
+
   // Emails
   readEmails: new Set(),
   unreadEmailCount: 12, // Total emails
-  
+
   // Logs
   viewedLogs: new Set(),
-  
+
   // Decryption
   solvedPuzzles: new Set(),
   decryptionAttempts: {},
   hasDecryptKey: false,
-  
+
   // Terminal
   commandsUsed: new Set(),
   currentTerminalPath: ['root'],
-  
+
+  // Notes
+  notes: [],
+
   // Meta
   gameStartTime: Date.now(),
   lastSaveTime: Date.now(),
@@ -255,8 +278,32 @@ export const useGameStore = create<GameState>()(
       addCommandUsed: (command) => set((state) => ({
         commandsUsed: new Set([...state.commandsUsed, command])
       })),
-      
+
       setTerminalPath: (path) => set({ currentTerminalPath: path }),
+
+      // Notes actions
+      addNote: (note) => set((state) => ({
+        notes: [
+          ...state.notes,
+          {
+            ...note,
+            id: `note_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            timestamp: Date.now(),
+          },
+        ],
+      })),
+
+      updateNote: (id, updates) => set((state) => ({
+        notes: state.notes.map((note) =>
+          note.id === id ? { ...note, ...updates } : note
+        ),
+      })),
+
+      deleteNote: (id) => set((state) => ({
+        notes: state.notes.filter((note) => note.id !== id),
+      })),
+
+      getNoteById: (id) => get().notes.find((note) => note.id === id),
 
       // Meta actions
       updatePlayTime: (seconds) => set((state) => ({

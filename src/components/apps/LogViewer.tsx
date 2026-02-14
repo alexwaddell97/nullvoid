@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { systemLogs, type LogEntry } from '../../data/logs';
 import { useGameStore } from '../../stores/GameStore';
+import { SelectionContextMenu } from '../shared/SelectionContextMenu';
 interface LogViewerProps {
   onClose: () => void;
 }
@@ -108,7 +109,7 @@ export const LogViewer = ({ onClose }: LogViewerProps) => {
           <span className="text-lg">📋</span>
           <span className="text-sm font-semibold">SYSTEM LOGS</span>
         </div>
-        <button 
+        <button
           onClick={onClose}
           className="text-red-500 hover:text-red-400 text-sm px-2 py-1 border border-red-500/30 hover:border-red-500/50 transition-colors"
         >
@@ -259,14 +260,19 @@ export const LogViewer = ({ onClose }: LogViewerProps) => {
         <div className="w-1/2 overflow-none">
           <AnimatePresence mode="wait">
             {selectedLog ? (
-              <motion.div
-                key={selectedLog.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="p-4"
+              <SelectionContextMenu
+                source={`log:${selectedLog.id}`}
+                sourceName={selectedLog.message}
+                category="Log"
               >
-                {/* Header */}
+                <motion.div
+                  key={selectedLog.id}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="p-4"
+                >
+                  {/* Header */}
                 <div className="mb-4 pb-3 border-b border-green-500/20">
                   <div className="flex items-center gap-2 mb-2">
                     <span className={clsx(
@@ -328,13 +334,14 @@ export const LogViewer = ({ onClose }: LogViewerProps) => {
                   </div>
                 )}
 
-                {/* Metadata */}
-                <div className="mt-6 pt-3 border-t border-green-500/20">
-                  <div className="text-xs text-green-700">
-                    Log ID: {selectedLog.id}
+                  {/* Metadata */}
+                  <div className="mt-6 pt-3 border-t border-green-500/20">
+                    <div className="text-xs text-green-700">
+                      Log ID: {selectedLog.id}
+                    </div>
                   </div>
-                </div>
-              </motion.div>
+                </motion.div>
+              </SelectionContextMenu>
             ) : (
               <motion.div
                 initial={{ opacity: 0 }}

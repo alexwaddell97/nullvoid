@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { fileSystem, type FileItem } from '../../data/files';
 import { useGameStore } from '../../stores/GameStore';
+import { SelectionContextMenu } from '../shared/SelectionContextMenu';
 
 interface FileBrowserProps {
   onClose: () => void;
@@ -93,7 +94,7 @@ export const FileBrowser = ({ onClose }: FileBrowserProps) => {
           <span className="text-lg">📁</span>
           <span className="text-sm font-semibold">FILE BROWSER</span>
         </div>
-        <button 
+        <button
           onClick={onClose}
           className="text-red-500 hover:text-red-400 text-sm px-2 py-1 border border-red-500/30 hover:border-red-500/50 transition-colors"
         >
@@ -193,61 +194,67 @@ export const FileBrowser = ({ onClose }: FileBrowserProps) => {
         <div className="w-1/2 overflow-y-auto overflow-hidden">
           <AnimatePresence mode="wait">
             {selectedFile ? (
-              <motion.div
-                key={selectedFile.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="p-4"
+              <SelectionContextMenu
+                source={`file:${selectedFile.id}`}
+                sourceName={selectedFile.name}
+                category="File"
               >
-                {/* File header */}
-                <div className="mb-4 pb-3 border-b border-green-500/20">
-                  <div className="text-green-300 font-semibold mb-2">
-                    {selectedFile.name}
+                <motion.div
+                  key={selectedFile.id}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="p-4"
+                >
+                  {/* File header */}
+                  <div className="mb-4 pb-3 border-b border-green-500/20">
+                    <div className="text-green-300 font-semibold mb-2">
+                      {selectedFile.name}
+                    </div>
+                    <div className="text-xs text-green-700 flex gap-4">
+                      {selectedFile.size && <span>Size: {selectedFile.size}</span>}
+                      {selectedFile.dateModified && <span>Modified: {selectedFile.dateModified}</span>}
+                      {isFileRead(selectedFile) && (
+                        <span className="text-green-500">✓ Read</span>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-xs text-green-700 flex gap-4">
-                    {selectedFile.size && <span>Size: {selectedFile.size}</span>}
-                    {selectedFile.dateModified && <span>Modified: {selectedFile.dateModified}</span>}
-                    {isFileRead(selectedFile) && (
-                      <span className="text-green-500">✓ Read</span>
+
+                  {/* File content */}
+                  <div className="text-sm text-green-400 whitespace-pre-wrap leading-relaxed">
+                    {selectedFile.encrypted && !encryptedFilesDecrypted.has(selectedFile.id) ? (
+                      <div className="text-red-400">
+                        [ENCRYPTED DATA]
+                        <br /><br />
+                        This file requires decryption.
+                        <br />
+                        Use the DECRYPT tool to access contents.
+                        {!hasDecryptKey && (
+                          <>
+                            <br /><br />
+                            <span className="text-amber-400">
+                              Note: You need to solve decryption puzzles first.
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    ) : selectedFile.imagePath ? (
+                      <div className="flex flex-col gap-3">
+                        <img
+                          src={selectedFile.imagePath}
+                          alt={selectedFile.name}
+                          className="max-w-full max-h-[60vh] object-contain border border-green-500/30"
+                        />
+                        {selectedFile.content && (
+                          <div>{selectedFile.content}</div>
+                        )}
+                      </div>
+                    ) : (
+                      selectedFile.content
                     )}
                   </div>
-                </div>
-
-                {/* File content */}
-                <div className="text-sm text-green-400 whitespace-pre-wrap leading-relaxed">
-                  {selectedFile.encrypted && !encryptedFilesDecrypted.has(selectedFile.id) ? (
-                    <div className="text-red-400">
-                      [ENCRYPTED DATA]
-                      <br /><br />
-                      This file requires decryption.
-                      <br />
-                      Use the DECRYPT tool to access contents.
-                      {!hasDecryptKey && (
-                        <>
-                          <br /><br />
-                          <span className="text-amber-400">
-                            Note: You need to solve decryption puzzles first.
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  ) : selectedFile.imagePath ? (
-                    <div className="flex flex-col gap-3">
-                      <img
-                        src={selectedFile.imagePath}
-                        alt={selectedFile.name}
-                        className="max-w-full max-h-[60vh] object-contain border border-green-500/30"
-                      />
-                      {selectedFile.content && (
-                        <div>{selectedFile.content}</div>
-                      )}
-                    </div>
-                  ) : (
-                    selectedFile.content
-                  )}
-                </div>
-              </motion.div>
+                </motion.div>
+              </SelectionContextMenu>
             ) : (
               <motion.div
                 initial={{ opacity: 0 }}

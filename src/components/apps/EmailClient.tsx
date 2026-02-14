@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { emails, type Email, type Attachment } from '../../data/emails';
 import { useSoundManager } from '../../hooks/useSoundManager';
 import { useGameStore } from '../../stores/GameStore';
+import { SelectionContextMenu } from '../shared/SelectionContextMenu';
 
 interface EmailClientProps {
   onClose: () => void;
@@ -216,7 +217,7 @@ const handleEmailClick = (email: Email) => {
           <span className="text-lg">✉️</span>
           <span className="text-sm font-semibold">EMAIL CLIENT</span>
         </div>
-        <button 
+        <button
           onClick={onClose}
           className="text-red-500 hover:text-red-400 text-sm px-2 py-1 border border-red-500/30 hover:border-red-500/50 transition-colors"
         >
@@ -360,50 +361,55 @@ const handleEmailClick = (email: Email) => {
         <div className="w-3/5 overflow-y-auto overflow-x-hidden">
           <AnimatePresence mode="wait">
             {selectedEmail ? (
-              <motion.div
-                key={selectedEmail.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="p-6"
+              <SelectionContextMenu
+                source={`email:${selectedEmail.id}`}
+                sourceName={selectedEmail.subject}
+                category="Email"
               >
-                {/* Email header */}
-                <div className="mb-6 pb-4 border-b border-green-500/20">
-                  <h2 className={clsx(
-                    'text-xl font-semibold mb-3',
-                    getImportanceColor(selectedEmail.importance)
-                  )}>
-                    {selectedEmail.subject}
-                  </h2>
+                <motion.div
+                  key={selectedEmail.id}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="p-6"
+                >
+                  {/* Email header */}
+                  <div className="mb-6 pb-4 border-b border-green-500/20">
+                    <h2 className={clsx(
+                      'text-xl font-semibold mb-3',
+                      getImportanceColor(selectedEmail.importance)
+                    )}>
+                      {selectedEmail.subject}
+                    </h2>
 
-                  <div className="space-y-2 text-sm">
-                    <div className="flex gap-2">
-                      <span className="text-green-700 w-16">From:</span>
-                      <span className="text-green-400">{selectedEmail.from}</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <span className="text-green-700 w-16">To:</span>
-                      <span className="text-green-400">{selectedEmail.to}</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <span className="text-green-700 w-16">Date:</span>
-                      <span className="text-green-400">{selectedEmail.date}</span>
-                    </div>
-                    {selectedEmail.importance && (
+                    <div className="space-y-2 text-sm">
                       <div className="flex gap-2">
-                        <span className="text-green-700 w-20">Priority:</span>
-                        <span className={getImportanceColor(selectedEmail.importance)}>
-                          {selectedEmail.importance.toUpperCase()}
-                        </span>
+                        <span className="text-green-700 w-16">From:</span>
+                        <span className="text-green-400">{selectedEmail.from}</span>
                       </div>
-                    )}
+                      <div className="flex gap-2">
+                        <span className="text-green-700 w-16">To:</span>
+                        <span className="text-green-400">{selectedEmail.to}</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <span className="text-green-700 w-16">Date:</span>
+                        <span className="text-green-400">{selectedEmail.date}</span>
+                      </div>
+                      {selectedEmail.importance && (
+                        <div className="flex gap-2">
+                          <span className="text-green-700 w-20">Priority:</span>
+                          <span className={getImportanceColor(selectedEmail.importance)}>
+                            {selectedEmail.importance.toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                {/* Email body */}
-                <div className="text-sm text-green-400 whitespace-pre-wrap leading-relaxed mb-6">
-                  {selectedEmail.body}
-                </div>
+                  {/* Email body */}
+                  <div className="text-sm text-green-400 whitespace-pre-wrap leading-relaxed mb-6">
+                    {selectedEmail.body}
+                  </div>
 
                 {/* Attachments */}
                 {selectedEmail.attachments && selectedEmail.attachments.length > 0 && (
@@ -434,20 +440,21 @@ const handleEmailClick = (email: Email) => {
                   </div>
                 )}
 
-                {/* Urgency warning */}
-                {selectedEmail.importance === 'urgent' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="mt-6 p-3 border border-red-500/30 bg-red-500/5 rounded"
-                  >
-                    <div className="text-xs text-red-400">
-                      ⚠ This message was marked as URGENT
-                    </div>
-                  </motion.div>
-                )}
-              </motion.div>
+                  {/* Urgency warning */}
+                  {selectedEmail.importance === 'urgent' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                      className="mt-6 p-3 border border-red-500/30 bg-red-500/5 rounded"
+                    >
+                      <div className="text-xs text-red-400">
+                        ⚠ This message was marked as URGENT
+                      </div>
+                    </motion.div>
+                  )}
+                </motion.div>
+              </SelectionContextMenu>
             ) : (
               <motion.div
                 initial={{ opacity: 0 }}
