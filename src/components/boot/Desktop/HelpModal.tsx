@@ -17,51 +17,51 @@ export const HelpModal = ({ onClose }: { onClose: () => void }) => {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-8 pointer-events-none"
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 pointer-events-none"
             >
-              <div className="bg-black border-2 border-green-500/50 rounded-lg max-w-2xl w-full shadow-2xl shadow-green-500/20">
+              <div className="bg-black border-2 border-green-500/50 rounded-lg max-w-2xl w-full shadow-2xl shadow-green-500/20 max-h-[90vh] flex flex-col overflow-hidden">
                 {/* Modal Header */}
-                <div className="p-6 border-b border-green-500/30 bg-green-500/10">
-                  <div className="text-2xl font-bold text-green-300 mb-2">
+                <div className="p-4 sm:p-6 border-b border-green-500/30 bg-green-500/10 shrink-0">
+                  <div className="text-lg sm:text-2xl font-bold text-green-300 mb-1 sm:mb-2">
                     SYSTEM INITIALIZATION COMPLETE
                   </div>
-                  <div className="text-sm text-green-700">
+                  <div className="text-xs sm:text-sm text-green-700">
                     NULLVOID OS v2.7.3
                   </div>
                 </div>
 
                 {/* Modal Content */}
-                <div className="p-6 space-y-4">
-                  <div className="text-green-400">
-                    <p className="mb-4">
+                <div className="p-4 sm:p-6 space-y-3 sm:space-y-4 overflow-y-auto">
+                  <div className="text-green-400 text-sm sm:text-base">
+                    <p className="mb-3 sm:mb-4">
                       System diagnostic reveals critical memory fragmentation.
                       Identity markers: NOT FOUND.
                     </p>
-                    <p className="mb-4">
-                      Timeline data is corrupted. The last clear memory is dated 
+                    <p className="mb-3 sm:mb-4">
+                      Timeline data is corrupted. The last clear memory is dated
                       <span className="text-amber-400 font-semibold"> March 13, 2094</span>.
                     </p>
-                    <p className="mb-4">
-                      <span className="text-red-400 font-semibold">Question:</span> Who am I? 
+                    <p className="mb-3 sm:mb-4">
+                      <span className="text-red-400 font-semibold">Question:</span> Who am I?
                       What happened here?
                     </p>
                   </div>
 
-                  <div className="border border-green-500/30 bg-green-500/5 p-4 rounded">
+                  <div className="border border-green-500/30 bg-green-500/5 p-3 sm:p-4 rounded">
                     <div className="text-xs text-green-600 mb-2 font-semibold">
                       PRIMARY OBJECTIVE:
                     </div>
-                    <div className="text-sm text-green-300">
-                      Access available files and system logs to reconstruct timeline 
+                    <div className="text-xs sm:text-sm text-green-300">
+                      Access available files and system logs to reconstruct timeline
                       and recover identity data.
                     </div>
                   </div>
 
-                  <div className="border border-amber-500/30 bg-amber-500/5 p-4 rounded">
+                  <div className="border border-amber-500/30 bg-amber-500/5 p-3 sm:p-4 rounded">
                     <div className="text-xs text-amber-600 mb-2 font-semibold">
                       AVAILABLE SYSTEMS:
                     </div>
-                    <ul className="text-sm text-amber-400 space-y-1">
+                    <ul className="text-xs sm:text-sm text-amber-400 space-y-1">
                       <li>• FILE BROWSER - Access documents and records</li>
                       <li>• TERMINAL - Execute system commands</li>
                       <li>• LOGS - Review system activity history</li>
@@ -69,11 +69,11 @@ export const HelpModal = ({ onClose }: { onClose: () => void }) => {
                     </ul>
                   </div>
 
-                  <div className="border border-red-500/30 bg-red-500/5 p-4 rounded">
+                  <div className="border border-red-500/30 bg-red-500/5 p-3 sm:p-4 rounded">
                     <div className="text-xs text-red-600 mb-2 font-semibold">
                       LOCKED SYSTEMS:
                     </div>
-                    <div className="text-sm text-red-400">
+                    <div className="text-xs sm:text-sm text-red-400">
                       Some systems require decryption keys or network access.
                       Discover unlock methods through investigation.
                     </div>
@@ -81,10 +81,10 @@ export const HelpModal = ({ onClose }: { onClose: () => void }) => {
                 </div>
 
                 {/* Modal Footer */}
-                <div className="p-6 border-t border-green-500/30 bg-green-500/5 pointer-events-auto">
+                <div className="p-4 sm:p-6 border-t border-green-500/30 bg-green-500/5 pointer-events-auto shrink-0">
                   <button
                     onClick={onClose}
-                    className="w-full px-4 py-3 bg-green-500/20 border border-green-500/50 text-green-300 hover:bg-green-500/30 transition-colors font-semibold"
+                    className="w-full px-4 py-2 sm:py-3 bg-green-500/20 border border-green-500/50 text-green-300 hover:bg-green-500/30 transition-colors font-semibold text-sm sm:text-base"
                   >
                     BEGIN INVESTIGATION →
                   </button>
