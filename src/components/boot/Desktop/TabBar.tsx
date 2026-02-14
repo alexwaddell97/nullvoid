@@ -64,11 +64,6 @@ export const TabBar = ({ onDesktopClick, isDesktopActive }: TabBarProps) => {
     closeWindow(windowId);
   };
 
-  // If no windows are open, don't show the tab bar
-  if (openWindows.length === 0) {
-    return null;
-  }
-
   return (
     <div className=" backdrop-blur-sm border-b border-green-500/30 overflow-x-auto scrollbar-thin scrollbar-thumb-green-500/30 scrollbar-track-transparent">
       <div className="flex items-center gap-1 p-1">
