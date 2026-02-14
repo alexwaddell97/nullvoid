@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWindowManager } from '../../../stores/WindowManager';
-import { X, Home, XCircle } from 'lucide-react';
+import { X, Home } from 'lucide-react';
 import { useEffect } from 'react';
 
 interface TabBarProps {
@@ -9,7 +9,7 @@ interface TabBarProps {
 }
 
 export const TabBar = ({ onDesktopClick, isDesktopActive }: TabBarProps) => {
-  const { openWindows, activeWindowId, setActiveWindow, closeWindow, closeAllWindows } = useWindowManager();
+  const { openWindows, activeWindowId, setActiveWindow, closeWindow } = useWindowManager();
 
   // Keyboard shortcuts for tab navigation
   useEffect(() => {
@@ -69,33 +69,37 @@ export const TabBar = ({ onDesktopClick, isDesktopActive }: TabBarProps) => {
     return null;
   }
 
-  const handleCloseAll = () => {
-    closeAllWindows();
-    onDesktopClick();
-  };
-
   return (
     <div className="bg-gray-900/95 backdrop-blur-sm border-b border-green-500/30 overflow-x-auto scrollbar-thin scrollbar-thumb-green-500/30 scrollbar-track-transparent">
-      <div className="flex items-center justify-between gap-1 p-1">
-        <div className="flex items-center gap-1 overflow-x-auto flex-1">
-          {/* Desktop/Home tab */}
-          <motion.button
+      <div className="flex items-center gap-1 p-1">
+        {/* Desktop/Home tab */}
+        <motion.div className="relative flex-shrink-0">
+          <button
             onClick={onDesktopClick}
             className={`
               flex items-center gap-2 px-3 py-2 rounded-t-lg transition-all
-              min-w-[100px] max-w-[200px] group relative flex-shrink-0
+              min-w-[120px] max-w-[200px] group relative
+              focus:outline-none focus-visible:outline-none
               ${
                 isDesktopActive
                   ? 'bg-gray-800 text-green-400 border-t border-x border-green-500/50'
                   : 'bg-gray-900/50 text-gray-400 hover:bg-gray-800/70 hover:text-green-300'
               }
             `}
-            whileHover={{ y: -1 }}
-            whileTap={{ scale: 0.98 }}
           >
             <Home size={14} className="flex-shrink-0" />
-            <span className="text-xs font-mono truncate">Desktop</span>
-          </motion.button>
+            <span className="text-xs font-mono truncate flex-1">Desktop</span>
+          </button>
+
+          {/* Active indicator */}
+          {isDesktopActive && (
+            <motion.div
+              layoutId="activeTab"
+              className="absolute bottom-0 left-0 right-0 h-0.5 bg-green-400"
+              transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
+            />
+          )}
+        </motion.div>
 
         {/* App tabs */}
         <AnimatePresence mode="popLayout">
@@ -116,6 +120,7 @@ export const TabBar = ({ onDesktopClick, isDesktopActive }: TabBarProps) => {
                   className={`
                     flex items-center gap-2 px-3 py-2 rounded-t-lg transition-all
                     min-w-[120px] max-w-[200px] group relative
+                    focus:outline-none focus-visible:outline-none
                     ${
                       isActive
                         ? 'bg-gray-800 text-green-400 border-t border-x border-green-500/50'
@@ -136,6 +141,7 @@ export const TabBar = ({ onDesktopClick, isDesktopActive }: TabBarProps) => {
                     onClick={(e) => handleCloseTab(e, window.id)}
                     className={`
                       flex-shrink-0 p-0.5 rounded transition-all
+                      focus:outline-none focus-visible:outline-none
                       ${
                         isActive
                           ? 'hover:bg-red-500/20 text-gray-400 hover:text-red-400'
@@ -161,22 +167,6 @@ export const TabBar = ({ onDesktopClick, isDesktopActive }: TabBarProps) => {
             );
           })}
         </AnimatePresence>
-        </div>
-
-        {/* Close All button - only show if windows are open */}
-        {openWindows.length > 0 && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            onClick={handleCloseAll}
-            className="flex items-center gap-1 px-2 py-2 text-xs font-mono text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded transition-all flex-shrink-0 ml-2"
-            title="Close all tabs (and return to desktop)"
-          >
-            <XCircle size={14} />
-            <span className="hidden sm:inline">Close All</span>
-          </motion.button>
-        )}
       </div>
     </div>
   );
