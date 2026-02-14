@@ -57,7 +57,7 @@ function App() {
   }, [bootPhase, sound]);
 
   return (
-    <div className="min-h-screen min-w-screen bg-black font-mono overflow-hidden">
+    <div className="h-screen w-screen bg-black font-mono overflow-hidden">
       {/* CRT Effect Overlay - always visible */}
       <div className="fixed inset-0 pointer-events-none z-50">
         {/* Scanline animation */}

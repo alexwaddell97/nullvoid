@@ -238,7 +238,7 @@ export const Notes = ({ onClose }: NotesProps) => {
 
       <div className="flex-1 flex overflow-hidden">
         {/* Notes List */}
-        <div className="w-2/5 border-r border-green-500/20 overflow-y-auto">
+        <div className="w-2/5 border-r border-green-500/20 overflow-y-auto overflow-x-hidden">
           <div className="divide-y divide-green-500/10">
             {filteredNotes.length === 0 ? (
               <div className="p-8 text-center text-green-700 text-sm">
@@ -316,7 +316,7 @@ export const Notes = ({ onClose }: NotesProps) => {
         </div>
 
         {/* Note Viewer/Editor */}
-        <div className="w-3/5 overflow-y-auto">
+        <div className="w-3/5 overflow-y-auto overflow-x-hidden">
           <AnimatePresence mode="wait">
             {isCreating || isEditing ? (
               <motion.div

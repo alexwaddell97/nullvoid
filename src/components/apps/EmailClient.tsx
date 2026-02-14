@@ -210,7 +210,7 @@ const handleEmailClick = (email: Email) => {
   };
 
   return (
-    <div className="bg-black text-green-400 font-mono h-screen flex flex-col relative">
+    <div className="bg-black text-green-400 font-mono h-screen w-screen flex flex-col relative">
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b border-green-500/30 bg-green-500/5">
         <div className="flex items-center gap-2">

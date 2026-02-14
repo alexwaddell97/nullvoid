@@ -170,7 +170,7 @@ const sound = useSoundManager();
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen bg-black text-green-400 p-3 sm:p-4 md:p-6"
+      className="max-h-screen bg-black text-green-400 p-3 sm:p-4 md:p-6"
     >
       {/* Onboarding Modal */}
       <AnimatePresence>
