@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { commands, type CommandContext } from '../../data/commands';
 import { useGameStore } from '../../stores/GameStore';
+import { Terminal as TerminalIcon } from 'lucide-react';
 
 interface TerminalProps {
   onClose: () => void;
@@ -165,7 +166,7 @@ export const Terminal = ({ onClose }: TerminalProps) => {
       {/* Terminal Header with close button */}
       <div className="flex items-center justify-between p-3 border-b border-green-500/30 bg-green-500/5">
         <div className="flex items-center gap-2">
-          <span className="text-lg">💻</span>
+          <TerminalIcon size={18} />
           <span className="text-sm font-semibold">TERMINAL</span>
           <span className="text-xs text-green-700 ml-2">
             {currentPath.length === 1 ? '/' : '/' + currentPath.slice(1).join('/')}

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { Save } from 'lucide-react';
 // adjust import path if needed
 
 export const TopBar = ({
@@ -71,13 +72,13 @@ export const TopBar = ({
                             <span className="hidden sm:inline">[?] </span>HELP
                         </button>
 
-                        {/* Save (floppy) */}
+                        {/* Save */}
                         <button
                             onClick={() => setShowSaveMenu(true)}
-                            className="text-xs font-semibold text-blue-600 hover:text-blue-400 border border-blue-500/40 px-2 sm:px-3 py-1 rounded transition-colors duration-200 active:scale-95 hover:border-blue-500/70 whitespace-nowrap"
+                            className="text-xs font-semibold text-blue-600 hover:text-blue-400 border border-blue-500/40 px-2 sm:px-3 py-1 rounded transition-colors duration-200 active:scale-95 hover:border-blue-500/70 whitespace-nowrap flex items-center gap-1"
                             title="Save"
                         >
-                            <span className="sm:mr-1">💾</span>
+                            <Save size={14} />
                             <span className="hidden sm:inline">SAVE</span>
                         </button>
 

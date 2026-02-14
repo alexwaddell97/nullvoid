@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '../stores/GameStore';
+import { Save } from 'lucide-react';
 
 interface SaveManagerProps {
   onClose: () => void;
@@ -98,7 +99,7 @@ export const SaveManager = ({ onClose }: SaveManagerProps) => {
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b border-green-500/30 bg-green-500/5">
         <div className="flex items-center gap-2">
-          <span className="text-lg">💾</span>
+          <Save size={18} />
           <span className="text-sm font-semibold">SAVE MANAGER</span>
         </div>
         <button 
@@ -170,9 +171,9 @@ export const SaveManager = ({ onClose }: SaveManagerProps) => {
                 </p>
                 <button
                   onClick={handleQuickSave}
-                  className="w-full py-3 bg-green-500/20 border border-green-500/50 text-green-300 hover:bg-green-500/30 transition-colors font-semibold"
+                  className="w-full py-3 bg-green-500/20 border border-green-500/50 text-green-300 hover:bg-green-500/30 transition-colors font-semibold flex items-center justify-center gap-2"
                 >
-                  💾 SAVE GAME
+                  <Save size={16} /> SAVE GAME
                 </button>
                 <div className="mt-3 text-xs text-green-700">
                   Last saved: {formatDate(lastSaveTime)}

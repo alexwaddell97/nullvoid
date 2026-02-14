@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { systemLogs, type LogEntry } from '../../data/logs';
 import { useGameStore } from '../../stores/GameStore';
 import { SelectionContextMenu } from '../shared/SelectionContextMenu';
+import { FileText } from 'lucide-react';
 interface LogViewerProps {
   onClose: () => void;
 }
@@ -106,7 +107,7 @@ export const LogViewer = ({ onClose }: LogViewerProps) => {
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b border-green-500/30 bg-green-500/5">
         <div className="flex items-center gap-2">
-          <span className="text-lg">📋</span>
+          <FileText size={18} />
           <span className="text-sm font-semibold">SYSTEM LOGS</span>
         </div>
         <button
@@ -349,7 +350,7 @@ export const LogViewer = ({ onClose }: LogViewerProps) => {
                 className="p-4 h-full flex items-center justify-center"
               >
                 <div className="text-green-700 text-sm text-center">
-                  <div className="text-4xl mb-4">📋</div>
+                  <div className="mb-4"><FileText size={48} /></div>
                   <div>Select a log entry to view details</div>
                   <div className="text-xs mt-2 text-green-800">
                     {filteredLogs.length} entries available

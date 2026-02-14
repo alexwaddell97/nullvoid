@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { useGameStore, type Note } from '../../stores/GameStore';
 import { useSoundManager } from '../../hooks/useSoundManager';
+import { StickyNote, Mail, Folder, FileText } from 'lucide-react';
 
 interface NotesProps {
   onClose: () => void;
@@ -141,12 +142,12 @@ export const Notes = ({ onClose }: NotesProps) => {
     setIsCreating(false);
   };
 
-  const getSourceIcon = (source?: string) => {
-    if (!source) return '📝';
-    if (source.startsWith('email')) return '✉️';
-    if (source.startsWith('file')) return '📁';
-    if (source.startsWith('log')) return '📋';
-    return '📝';
+  const getSourceIcon = (source?: string, size = 16) => {
+    if (!source) return <StickyNote size={size} />;
+    if (source.startsWith('email')) return <Mail size={size} />;
+    if (source.startsWith('file')) return <Folder size={size} />;
+    if (source.startsWith('log')) return <FileText size={size} />;
+    return <StickyNote size={size} />;
   };
 
   const getSourceLabel = (source?: string) => {
@@ -162,7 +163,7 @@ export const Notes = ({ onClose }: NotesProps) => {
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b border-green-500/30 bg-green-500/5">
         <div className="flex items-center gap-2">
-          <span className="text-lg">📝</span>
+          <StickyNote size={18} />
           <span className="text-sm font-semibold">NOTES</span>
         </div>
         <div className="flex items-center gap-2">
@@ -244,7 +245,7 @@ export const Notes = ({ onClose }: NotesProps) => {
               <div className="p-8 text-center text-green-700 text-sm">
                 {notes.length === 0 ? (
                   <>
-                    <div className="text-4xl mb-4">📝</div>
+                    <div className="mb-4"><StickyNote size={48} /></div>
                     <div className="mb-2">No notes yet</div>
                     <div className="text-xs text-green-800">
                       Create a note or highlight text in emails, files, and logs
@@ -488,7 +489,7 @@ export const Notes = ({ onClose }: NotesProps) => {
                 className="p-6 h-full flex items-center justify-center"
               >
                 <div className="text-green-700 text-sm text-center">
-                  <div className="text-4xl mb-4">📝</div>
+                  <div className="mb-4"><StickyNote size={48} /></div>
                   <div>Select a note to view</div>
                   <div className="text-xs mt-2 text-green-800">
                     or create a new note

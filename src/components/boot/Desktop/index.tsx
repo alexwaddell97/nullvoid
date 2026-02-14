@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
+import { Folder, Terminal as TerminalIcon, Globe, FileText, Unlock, Archive, Mail, Microscope, Lock } from 'lucide-react';
 
 // Import apps
 import { Terminal } from '../../apps/Terminal';
@@ -25,7 +26,7 @@ import { TabBar } from './TabBar';
 interface DesktopApp {
   id: string;
   name: string;
-  icon: string;
+  icon: React.ReactNode;
   locked?: boolean;
   description?: string;
   unlockHint?: string;
@@ -52,58 +53,58 @@ export const Desktop = () => {
   }, []);
 
   const apps: DesktopApp[] = [
-    { 
-      id: 'files', 
-      name: 'FILES', 
-      icon: '📁', 
+    {
+      id: 'files',
+      name: 'FILES',
+      icon: <Folder size={24} />,
       description: 'File System',
     },
-    { 
-      id: 'terminal', 
-      name: 'TERMINAL', 
-      icon: '💻', 
+    {
+      id: 'terminal',
+      name: 'TERMINAL',
+      icon: <TerminalIcon size={24} />,
       description: 'Command Line',
     },
-    { 
-      id: 'network', 
-      name: 'NETWORK', 
-      icon: '🌐', 
-      description: 'Network Access', 
+    {
+      id: 'network',
+      name: 'NETWORK',
+      icon: <Globe size={24} />,
+      description: 'Network Access',
       locked: true,
       unlockHint: 'Find access codes in encrypted files'
     },
-    { 
-      id: 'logs', 
-      name: 'LOGS', 
-      icon: '📋', 
+    {
+      id: 'logs',
+      name: 'LOGS',
+      icon: <FileText size={24} />,
       description: 'System Logs',
     },
-    { 
-      id: 'decrypt', 
-      name: 'DECRYPT', 
-      icon: '🔓', 
-      description: 'Decryption Tool', 
+    {
+      id: 'decrypt',
+      name: 'DECRYPT',
+      icon: <Unlock size={24} />,
+      description: 'Decryption Tool',
       locked: false,
       unlockHint: 'Unlock by finding decryption keys'
     },
-    { 
-      id: 'archive', 
-      name: 'ARCHIVE', 
-      icon: '📦', 
+    {
+      id: 'archive',
+      name: 'ARCHIVE',
+      icon: <Archive size={24} />,
       description: 'Data Archive',
     },
-    { 
-      id: 'email', 
-      name: 'EMAIL', 
-      icon: '✉️', 
-      description: 'Email Client', 
+    {
+      id: 'email',
+      name: 'EMAIL',
+      icon: <Mail size={24} />,
+      description: 'Email Client',
       locked: false,
       unlockHint: 'Requires network access'
     },
-    { 
-      id: 'research', 
-      name: 'RESEARCH', 
-      icon: '🔬', 
+    {
+      id: 'research',
+      name: 'RESEARCH',
+      icon: <Microscope size={24} />,
       description: 'Research Database',
       locked: true,
       unlockHint: 'Requires network access'
@@ -116,7 +117,7 @@ export const Desktop = () => {
       sound.play('errorBeep');
       // TODO: Show locked message/sound effect
     } else {
-      openWindow(app.id, app.name, app.icon);
+      openWindow(app.id, app.name, app.id);
       setShowDesktop(false);
       // Dismiss onboarding on first app open
       if (showOnboarding) {
@@ -184,7 +185,7 @@ export const Desktop = () => {
       <TopBar
         setShowSaveMenu={(show) => {
           if (show) {
-            openWindow('settings', 'SETTINGS', '⚙️');
+            openWindow('settings', 'SETTINGS', 'settings');
             setShowDesktop(false);
           }
         }}
@@ -325,13 +326,15 @@ const DesktopView = ({
                 >
                   {/* Lock icon overlay */}
                   {app.locked && (
-                    <div className="absolute top-1 right-1 sm:top-2 sm:right-2 text-red-500 text-sm sm:text-lg">
-                      🔒
+                    <div className="absolute top-1 right-1 sm:top-2 sm:right-2 text-red-500">
+                      <Lock size={20} />
                     </div>
                   )}
 
                   {/* App icon */}
-                  <div className="text-3xl sm:text-4xl md:text-5xl">{app.icon}</div>
+                  <div className={clsx(
+                    app.locked ? 'text-red-400' : 'text-green-400'
+                  )}>{app.icon}</div>
 
                   {/* App name */}
                   <div className={clsx(
@@ -351,8 +354,8 @@ const DesktopView = ({
                   {/* Unlock hint on hover/tap */}
                   {app.locked && app.unlockHint && (
                     <div className="absolute inset-0 bg-black/90 opacity-0 hover:opacity-100 active:opacity-100 transition-opacity flex items-center justify-center p-3 rounded">
-                      <div className="text-xs text-red-400 text-center">
-                        🔒 {app.unlockHint}
+                      <div className="text-xs text-red-400 text-center flex items-center gap-2">
+                        <Lock size={14} /> {app.unlockHint}
                       </div>
                     </div>
                   )}
