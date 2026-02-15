@@ -14,6 +14,7 @@ export interface Note {
   tags?: string[];
   // Board view properties
   position?: { x: number; y: number };
+  size?: { width: number; height: number };
   connections?: string[]; // Array of note IDs this note is connected to
 }
 
