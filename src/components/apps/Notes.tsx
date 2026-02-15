@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { useGameStore, type Note } from '../../stores/GameStore';
 import { useSoundManager } from '../../hooks/useSoundManager';
-import { StickyNote, Mail, Folder, FileText } from 'lucide-react';
+import { StickyNote, Mail, Folder, FileText, Save, Edit, Trash2 } from 'lucide-react';
 
 interface NotesProps {
   onClose: () => void;
@@ -390,9 +390,9 @@ export const Notes = ({ onClose }: NotesProps) => {
                   <div className="flex gap-2 pt-4 border-t border-green-500/20">
                     <button
                       onClick={handleSave}
-                      className="px-4 py-2 bg-green-500/10 border border-green-500/30 text-green-400 hover:bg-green-500/20 hover:border-green-500/50 transition-colors text-sm"
+                      className="px-4 py-2 bg-green-500/10 border border-green-500/30 text-green-400 hover:bg-green-500/20 hover:border-green-500/50 transition-colors text-sm flex items-center gap-2"
                     >
-                      💾 SAVE
+                      <Save size={16} /> SAVE
                     </button>
                     <button
                       onClick={handleCancel}
@@ -470,15 +470,15 @@ export const Notes = ({ onClose }: NotesProps) => {
                 <div className="flex gap-2 pt-4 border-t border-green-500/20">
                   <button
                     onClick={handleEdit}
-                    className="px-4 py-2 bg-green-500/10 border border-green-500/30 text-green-400 hover:bg-green-500/20 hover:border-green-500/50 transition-colors text-sm"
+                    className="px-4 py-2 bg-green-500/10 border border-green-500/30 text-green-400 hover:bg-green-500/20 hover:border-green-500/50 transition-colors text-sm flex items-center gap-2"
                   >
-                    ✏️ EDIT
+                    <Edit size={16} /> EDIT
                   </button>
                   <button
                     onClick={handleDelete}
-                    className="px-4 py-2 border border-red-500/30 text-red-500 hover:bg-red-500/10 hover:border-red-500/50 transition-colors text-sm"
+                    className="px-4 py-2 border border-red-500/30 text-red-500 hover:bg-red-500/10 hover:border-red-500/50 transition-colors text-sm flex items-center gap-2"
                   >
-                    🗑️ DELETE
+                    <Trash2 size={16} /> DELETE
                   </button>
                 </div>
               </motion.div>
