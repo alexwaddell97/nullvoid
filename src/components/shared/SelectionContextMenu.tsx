@@ -56,10 +56,7 @@ export const SelectionContextMenu = ({
       setShowToast(true);
       setTimeout(() => setShowToast(false), 2000);
 
-      // Clear selection after a short delay
-      setTimeout(() => {
-        window.getSelection()?.removeAllRanges();
-      }, 100);
+      // Don't clear the selection - let user keep their text highlighted
     }
   };
 
