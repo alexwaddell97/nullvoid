@@ -90,7 +90,7 @@ export const SelectionContextMenu = ({
   };
 
   return (
-    <div ref={containerRef} onContextMenu={handleContextMenu}>
+    <div ref={containerRef} onContextMenu={handleContextMenu} className='h-full'>
       {children}
 
       {/* Context Menu */}
