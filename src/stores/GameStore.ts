@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { Email, Attachment } from '../data/emails';
 
 // Types
 export interface Note {
@@ -50,6 +51,9 @@ export interface GameProgress {
   // Notes
   notes: Note[];
 
+  // Dynamic Emails
+  dynamicEmails: Email[];
+
   // Metadata
   gameStartTime: number;
   lastSaveTime: number;
@@ -92,6 +96,21 @@ export interface GameState extends GameProgress {
   updateNote: (id: string, updates: Partial<Note>) => void;
   deleteNote: (id: string) => void;
   getNoteById: (id: string) => Note | undefined;
+
+  // Actions - Dynamic Emails
+  pushEmail: (email: Omit<Email, 'id' | 'read'>) => string;
+  createEmail: (params: {
+    from: string;
+    to: string;
+    subject: string;
+    body: string;
+    date?: string;
+    importance?: 'low' | 'normal' | 'high' | 'urgent';
+    attachments?: Attachment[];
+    tags?: string[];
+  }) => string;
+  getDynamicEmails: () => Email[];
+  clearDynamicEmails: () => void;
 
   // Actions - Meta
   updatePlayTime: (seconds: number) => void;
@@ -140,6 +159,9 @@ const initialState: GameProgress = {
 
   // Notes
   notes: [],
+
+  // Dynamic Emails
+  dynamicEmails: [],
 
   // Meta
   gameStartTime: Date.now(),
@@ -307,6 +329,50 @@ export const useGameStore = create<GameState>()(
       })),
 
       getNoteById: (id) => get().notes.find((note) => note.id === id),
+
+      // Dynamic Email actions
+      pushEmail: (email) => {
+        const emailId = `dynamic_email_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const newEmail: Email = {
+          ...email,
+          id: emailId,
+          read: false,
+        };
+
+        set((state) => ({
+          dynamicEmails: [...state.dynamicEmails, newEmail],
+          unreadEmailCount: state.unreadEmailCount + 1,
+        }));
+
+        return emailId;
+      },
+
+      createEmail: ({ from, to, subject, body, date, importance, attachments, tags }) => {
+        const emailId = `dynamic_email_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const newEmail: Email = {
+          id: emailId,
+          from,
+          to,
+          subject,
+          body,
+          date: date || new Date().toISOString().split('T')[0],
+          importance: importance || 'normal',
+          attachments,
+          tags,
+          read: false,
+        };
+
+        set((state) => ({
+          dynamicEmails: [...state.dynamicEmails, newEmail],
+          unreadEmailCount: state.unreadEmailCount + 1,
+        }));
+
+        return emailId;
+      },
+
+      getDynamicEmails: () => get().dynamicEmails,
+
+      clearDynamicEmails: () => set({ dynamicEmails: [] }),
 
       // Meta actions
       updatePlayTime: (seconds) => set((state) => ({
