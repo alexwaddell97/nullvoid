@@ -1,9 +1,10 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWindowManager } from '../../../stores/WindowManager';
-import { X, Home, Folder, Terminal, Globe, FileText, Unlock, Archive, Mail, Microscope, Settings, StickyNote } from 'lucide-react';
+import { X, Home, Folder, Terminal, Globe, FileText, Unlock, Archive, Mail, Microscope, Settings, StickyNote, Bell } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { NotesModal } from '../../apps/NotesModal';
 import { useGameStore } from '../../../stores/GameStore';
+import { useSoundManager } from '../../../hooks/useSoundManager';
 
 interface TabBarProps {
   onDesktopClick: () => void;
@@ -12,9 +13,10 @@ interface TabBarProps {
 }
 
 export const TabBar = ({ onDesktopClick, onAppTabClick, isDesktopActive }: TabBarProps) => {
-  const { openWindows, activeWindowId, setActiveWindow, closeWindow } = useWindowManager();
+  const { openWindows, activeWindowId, setActiveWindow, closeWindow, clearNotification } = useWindowManager();
   const [showNotes, setShowNotes] = useState(false);
   const { notes } = useGameStore();
+  const sound = useSoundManager();
 
   // Helper function to get icon component by appId
   const getIconComponent = (appId: string) => {
@@ -70,7 +72,7 @@ export const TabBar = ({ onDesktopClick, onAppTabClick, isDesktopActive }: TabBa
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [openWindows, activeWindowId, setActiveWindow, closeWindow]);
 
-  const handleTabClick = (e: React.MouseEvent, windowId: string) => {
+  const handleTabClick = (e: React.MouseEvent, windowId: string, appId: string) => {
     // Middle click (mouse button 1) closes the tab
     if (e.button === 1) {
       e.preventDefault();
@@ -78,6 +80,8 @@ export const TabBar = ({ onDesktopClick, onAppTabClick, isDesktopActive }: TabBa
     } else if (e.button === 0) {
       // Left click switches to tab
       setActiveWindow(windowId);
+      // Clear notification when clicking on a tab
+      clearNotification(appId);
       // Notify parent that an app tab was clicked (to hide desktop)
       onAppTabClick?.();
     }
@@ -140,7 +144,7 @@ export const TabBar = ({ onDesktopClick, onAppTabClick, isDesktopActive }: TabBa
                   className="relative flex-shrink-0"
                 >
                   <button
-                    onMouseDown={(e) => handleTabClick(e, window.id)}
+                    onMouseDown={(e) => handleTabClick(e, window.id, window.appId)}
                     className={`
                       flex items-center gap-2 px-3 py-2 rounded-t-lg transition-all
                       min-w-[120px] max-w-[200px] group relative
@@ -152,31 +156,46 @@ export const TabBar = ({ onDesktopClick, onAppTabClick, isDesktopActive }: TabBa
                       }
                     `}
                   >
-                    {/* Icon */}
-                    <span className="flex-shrink-0">{getIconComponent(window.appId)}</span>
+                    {/* Icon with notification dot */}
+                    <span className="flex-shrink-0 relative">
+                      {getIconComponent(window.appId)}
+                      {window.hasNotification && !isActive && (
+                        <motion.span
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="absolute -top-1 -right-1 w-2 h-2 bg-amber-400 rounded-full animate-pulse"
+                        />
+                      )}
+                    </span>
 
                     {/* Title */}
                     <span className="text-xs font-mono truncate flex-1 uppercase">
                       {window.title}
                     </span>
 
-                    {/* Close button */}
-                    <button
-                      onClick={(e) => handleCloseTab(e, window.id)}
-                      className={`
-                        flex-shrink-0 p-0.5 rounded transition-all self-start mt-0.5
-                        focus:outline-none focus-visible:outline-none
-                        ${
-                          isActive
-                            ? 'hover:bg-red-500/20 text-gray-400 hover:text-red-400'
-                            : 'hover:bg-red-500/20 text-gray-500 hover:text-red-400'
-                        }
-                        opacity-0 group-hover:opacity-100
-                      `}
-                      aria-label="Close tab"
-                    >
-                      <X size={12} />
-                    </button>
+                    {/* Notification count or Close button */}
+                    {window.hasNotification && !isActive && window.notificationCount ? (
+                      <span className="flex-shrink-0 w-5 h-5 bg-amber-500 text-black text-xs font-bold rounded-full flex items-center justify-center">
+                        {window.notificationCount > 9 ? '9+' : window.notificationCount}
+                      </span>
+                    ) : (
+                      <button
+                        onClick={(e) => handleCloseTab(e, window.id)}
+                        className={`
+                          flex-shrink-0 p-0.5 rounded transition-all self-start mt-0.5
+                          focus:outline-none focus-visible:outline-none
+                          ${
+                            isActive
+                              ? 'hover:bg-red-500/20 text-gray-400 hover:text-red-400'
+                              : 'hover:bg-red-500/20 text-gray-500 hover:text-red-400'
+                          }
+                          opacity-0 group-hover:opacity-100
+                        `}
+                        aria-label="Close tab"
+                      >
+                        <X size={12} />
+                      </button>
+                    )}
                   </button>
 
                   {/* Active indicator */}

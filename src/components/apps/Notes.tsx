@@ -169,7 +169,7 @@ export const Notes = ({ onClose }: NotesProps) => {
 
   // If board view is active, render the board instead
   if (viewMode === 'board') {
-    return <NotesBoard onClose={onClose} />;
+    return <NotesBoard onClose={onClose} onSwitchToList={() => setViewMode('list')} />;
   }
 
   return (
@@ -303,7 +303,7 @@ export const Notes = ({ onClose }: NotesProps) => {
                   <div className="space-y-1">
                     {/* Header */}
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="text-lg">{getSourceIcon(note.source)}</span>
+                      <span className="shrink-0">{getSourceIcon(note.source)}</span>
                       <span className="text-green-700">
                         {new Date(note.timestamp).toLocaleString()}
                       </span>
