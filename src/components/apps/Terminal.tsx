@@ -162,7 +162,7 @@ export const Terminal = ({ onClose }: TerminalProps) => {
   };
 
   return (
-    <div className="bg-black text-green-400 font-mono h-screen flex flex-col">
+    <div className="bg-black text-green-400 font-mono h-full flex flex-col">
       {/* Terminal Header with close button */}
       <div className="flex items-center justify-between p-3 border-b border-green-500/30 bg-green-500/5">
         <div className="flex items-center gap-2">

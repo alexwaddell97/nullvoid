@@ -103,7 +103,7 @@ export const LogViewer = ({ onClose }: LogViewerProps) => {
 };
 
   return (
-    <div className="bg-black text-green-400 font-mono h-screen flex flex-col">
+    <div className="bg-black text-green-400 font-mono h-full flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b border-green-500/30 bg-green-500/5">
         <div className="flex items-center gap-2">
