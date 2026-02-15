@@ -3,9 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { useGameStore, type Note } from '../../stores/GameStore';
 import { useSoundManager } from '../../hooks/useSoundManager';
-import { StickyNote, Mail, Folder, FileText, Save, Edit, Trash2, Grid, List } from 'lucide-react';
-import { ConfirmModal } from '../shared/ConfirmModal';
-import { NotesBoard } from './NotesBoard';
+import { StickyNote, Mail, Folder, FileText, Save, Edit, Trash2 } from 'lucide-react';
 
 interface NotesProps {
   onClose: () => void;
@@ -24,8 +22,6 @@ export const Notes = ({ onClose }: NotesProps) => {
   const [filterType, setFilterType] = useState<FilterType>('all');
   const [sortType, setSortType] = useState<SortType>('newest');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
 
   // Form state
   const [formTitle, setFormTitle] = useState('');
@@ -133,15 +129,10 @@ export const Notes = ({ onClose }: NotesProps) => {
   };
 
   const handleDelete = () => {
-    setShowDeleteConfirm(true);
-  };
-
-  const confirmDelete = () => {
-    if (selectedNote) {
+    if (selectedNote && confirm('Delete this note? This cannot be undone.')) {
       deleteNote(selectedNote.id);
       setSelectedNote(null);
       setIsEditing(false);
-      setShowDeleteConfirm(false);
       //sound.play('error');
     }
   };
@@ -167,11 +158,6 @@ export const Notes = ({ onClose }: NotesProps) => {
     return 'Custom Note';
   };
 
-  // If board view is active, render the board instead
-  if (viewMode === 'board') {
-    return <NotesBoard onClose={onClose} />;
-  }
-
   return (
     <div className="bg-black text-green-400 font-mono h-full flex flex-col">
       {/* Header */}
@@ -181,23 +167,6 @@ export const Notes = ({ onClose }: NotesProps) => {
           <span className="text-sm font-semibold">NOTES</span>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setViewMode(viewMode === 'list' ? 'board' : 'list')}
-            className="text-cyan-500 hover:text-cyan-400 text-sm px-2 py-1 border border-cyan-500/30 hover:border-cyan-500/50 transition-colors flex items-center gap-1"
-            title={viewMode === 'list' ? 'Switch to board view' : 'Switch to list view'}
-          >
-            {viewMode === 'list' ? (
-              <>
-                <Grid size={14} />
-                <span className="hidden sm:inline">BOARD</span>
-              </>
-            ) : (
-              <>
-                <List size={14} />
-                <span className="hidden sm:inline">LIST</span>
-              </>
-            )}
-          </button>
           <button
             onClick={handleCreateNew}
             className="text-green-500 hover:text-green-400 text-sm px-2 py-1 border border-green-500/30 hover:border-green-500/50 transition-colors"
@@ -539,18 +508,6 @@ export const Notes = ({ onClose }: NotesProps) => {
           {notes.length} {notes.length === 1 ? 'note' : 'notes'} total
         </span>
       </div>
-
-      {/* Delete Confirmation Modal */}
-      <ConfirmModal
-        isOpen={showDeleteConfirm}
-        title="DELETE NOTE"
-        message={`Are you sure you want to delete "${selectedNote?.title}"? This action cannot be undone.`}
-        confirmText="DELETE"
-        cancelText="CANCEL"
-        variant="danger"
-        onConfirm={confirmDelete}
-        onCancel={() => setShowDeleteConfirm(false)}
-      />
     </div>
   );
 };

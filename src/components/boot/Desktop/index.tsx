@@ -35,11 +35,7 @@ interface DesktopApp {
 export const Desktop = () => {
   const sound = useSoundManager();
   const { openWindow, closeWindow, activeWindowId, openWindows, getActiveApp } = useWindowManager();
-  const [showOnboarding, setShowOnboarding] = useState(() => {
-    // Check localStorage to see if help modal was dismissed before
-    const dismissed = localStorage.getItem('nullvoid-help-dismissed');
-    return !dismissed; // Show onboarding only if not previously dismissed
-  });
+  const [showOnboarding, setShowOnboarding] = useState(true);
   const [currentObjective] = useState('Investigate your identity');
   const [discoveredClues] = useState<string[]>([]);
   const [isMobile, setIsMobile] = useState(false);
@@ -123,10 +119,9 @@ export const Desktop = () => {
     } else {
       openWindow(app.id, app.name, app.id);
       setShowDesktop(false);
-      // Dismiss onboarding on first app open and persist to localStorage
+      // Dismiss onboarding on first app open
       if (showOnboarding) {
         setShowOnboarding(false);
-        localStorage.setItem('nullvoid-help-dismissed', 'true');
       }
     }
   };
@@ -211,10 +206,7 @@ export const Desktop = () => {
       {/* Onboarding Modal */}
       <AnimatePresence>
         {showOnboarding && (
-          <HelpModal onClose={() => {
-            setShowOnboarding(false);
-            localStorage.setItem('nullvoid-help-dismissed', 'true');
-          }} />
+          <HelpModal onClose={() => setShowOnboarding(false)} />
         )}
       </AnimatePresence>
 

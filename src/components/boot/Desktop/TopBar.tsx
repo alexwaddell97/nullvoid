@@ -1,8 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { Save } from 'lucide-react';
-import { ConfirmModal } from '../shared/ConfirmModal';
-import { useGameStore } from '../../stores/GameStore';
 // adjust import path if needed
 
 export const TopBar = ({
@@ -12,10 +10,9 @@ export const TopBar = ({
   setShowSaveMenu: (show: boolean) => void,
   setShowOnboarding: React.Dispatch<React.SetStateAction<boolean>>,
 }) => {
-    const { saveGame } = useGameStore();
+
     const [now, setNow] = useState(new Date());
     const [isMobile, setIsMobile] = useState(false);
-    const [showExitModal, setShowExitModal] = useState(false);
     
     useEffect(() => {
         const interval = setInterval(() => setNow(new Date()), 1000);
@@ -32,21 +29,7 @@ export const TopBar = ({
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    const handleExit = () => {
-        try {
-            window.close();
-        } catch (e) {
-            console.error('Unable to close window:', e);
-        }
-    };
-
-    const handleSaveAndExit = () => {
-        saveGame();
-        handleExit();
-    };
-
     return (
-        <>
         <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -100,7 +83,13 @@ export const TopBar = ({
                         </button>
 
                         <button
-                            onClick={() => setShowExitModal(true)}
+                            onClick={() => {
+                                try {
+                                    window.close();
+                                } catch (e) {
+                                    console.error('Unable to close window:', e);
+                                }
+                            }}
                             className="text-xs font-semibold text-red-600 hover:text-red-400 border border-red-500/40 px-2 sm:px-3 py-1 rounded transition-colors duration-200 active:scale-95 hover:border-red-500/70 whitespace-nowrap"
                             title="Power off"
                         >
@@ -118,64 +107,5 @@ export const TopBar = ({
                 </div>
             )}
         </motion.div>
-
-        {/* Exit Confirmation Modal with custom actions */}
-        {showExitModal && (
-            <div className="fixed inset-0 z-[200] flex items-center justify-center">
-                {/* Backdrop */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    onClick={() => setShowExitModal(false)}
-                    className="fixed inset-0 bg-black/90 backdrop-blur-sm cursor-pointer"
-                />
-
-                {/* Modal */}
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                    className="relative bg-black border-2 border-red-500/50 rounded-lg max-w-md w-full shadow-2xl shadow-red-500/20 mx-4"
-                >
-                    {/* Modal Header */}
-                    <div className="p-4 border-b border-red-500/50 bg-red-500/10">
-                        <div className="text-lg font-bold text-red-300">
-                            EXIT NULLVOID OS
-                        </div>
-                    </div>
-
-                    {/* Modal Content */}
-                    <div className="p-6">
-                        <p className="text-green-400 text-sm leading-relaxed">
-                            Are you sure you want to exit? Any unsaved progress will be lost.
-                        </p>
-                    </div>
-
-                    {/* Modal Actions */}
-                    <div className="p-4 border-t border-red-500/50 bg-red-500/10 flex flex-col gap-2">
-                        <button
-                            onClick={handleSaveAndExit}
-                            className="w-full px-4 py-2 border bg-green-500/20 border-green-500/50 text-green-300 hover:bg-green-500/30 hover:border-green-500/70 transition-colors font-semibold text-sm"
-                        >
-                            💾 SAVE & EXIT
-                        </button>
-                        <button
-                            onClick={handleExit}
-                            className="w-full px-4 py-2 border bg-red-500/20 border-red-500/50 text-red-300 hover:bg-red-500/30 hover:border-red-500/70 transition-colors font-semibold text-sm"
-                        >
-                            EXIT WITHOUT SAVING
-                        </button>
-                        <button
-                            onClick={() => setShowExitModal(false)}
-                            className="w-full px-4 py-2 border border-green-500/30 text-green-400 hover:bg-green-500/10 hover:border-green-500/50 transition-colors font-semibold text-sm"
-                        >
-                            CANCEL
-                        </button>
-                    </div>
-                </motion.div>
-            </div>
-        )}
-        </>
     );
 };
