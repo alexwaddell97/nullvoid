@@ -11,6 +11,9 @@ export interface Note {
   category?: string;
   timestamp: number;
   tags?: string[];
+  // Board view properties
+  position?: { x: number; y: number };
+  connections?: string[]; // Array of note IDs this note is connected to
 }
 
 export interface GameProgress {

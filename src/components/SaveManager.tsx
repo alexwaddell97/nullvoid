@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '../stores/GameStore';
 import { Save } from 'lucide-react';
+import { ConfirmModal } from './shared/ConfirmModal';
 
 interface SaveManagerProps {
   onClose: () => void;
@@ -11,6 +12,7 @@ export const SaveManager = ({ onClose }: SaveManagerProps) => {
   const [activeTab, setActiveTab] = useState<'save' | 'load' | 'stats'>('save');
   const [importText, setImportText] = useState('');
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const {
     gameStartTime,
@@ -73,14 +75,17 @@ export const SaveManager = ({ onClose }: SaveManagerProps) => {
   };
 
   const handleReset = () => {
-    if (window.confirm('Are you sure you want to reset ALL progress? This cannot be undone!')) {
-      resetGame();
-      setMessage({ type: 'success', text: 'Game reset. Starting fresh...' });
-      setTimeout(() => {
-        setMessage(null);
-        onClose();
-      }, 2000);
-    }
+    setShowResetConfirm(true);
+  };
+
+  const confirmReset = () => {
+    resetGame();
+    setShowResetConfirm(false);
+    setMessage({ type: 'success', text: 'Game reset. Starting fresh...' });
+    setTimeout(() => {
+      setMessage(null);
+      onClose();
+    }, 2000);
   };
 
   const formatTime = (seconds: number) => {
@@ -362,6 +367,18 @@ export const SaveManager = ({ onClose }: SaveManagerProps) => {
       <div className="p-2 border-t border-green-500/30 bg-green-500/5 text-xs text-green-700">
         Auto-save enabled • Progress saved to browser storage
       </div>
+
+      {/* Reset Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showResetConfirm}
+        title="RESET GAME"
+        message="Are you sure you want to reset ALL progress? This will delete all your saves, notes, and story progress. This action cannot be undone!"
+        confirmText="RESET EVERYTHING"
+        cancelText="CANCEL"
+        variant="danger"
+        onConfirm={confirmReset}
+        onCancel={() => setShowResetConfirm(false)}
+      />
     </div>
   );
 };
