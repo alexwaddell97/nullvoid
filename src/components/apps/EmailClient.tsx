@@ -20,6 +20,7 @@ export const EmailClient = ({ onClose }: EmailClientProps) => {
      const {
     readEmails,
     markEmailAsRead,
+    dynamicEmails,
     //unreadEmailCount,
   } = useGameStore();
 
@@ -27,12 +28,26 @@ export const EmailClient = ({ onClose }: EmailClientProps) => {
 
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
   const [selectedAttachment, setSelectedAttachment] = useState<Attachment | null>(null);
- const [emailList, setEmailList] = useState<Email[]>(
-    emails.map(email => ({
+
+  // Combine static emails with dynamic emails
+  const allEmails = useMemo(() => {
+    return [...emails, ...dynamicEmails];
+  }, [dynamicEmails]);
+
+  const [emailList, setEmailList] = useState<Email[]>(
+    allEmails.map(email => ({
       ...email,
       read: readEmails.has(email.id)
     }))
   );
+
+  // Update email list when dynamic emails change
+  useEffect(() => {
+    setEmailList(allEmails.map(email => ({
+      ...email,
+      read: readEmails.has(email.id)
+    })));
+  }, [dynamicEmails, readEmails, allEmails]);
   const [filterType, setFilterType] = useState<FilterType>('all');
   const [sortType, setSortType] = useState<SortType>('date-desc');
   const [searchQuery, setSearchQuery] = useState('');
