@@ -1,7 +1,6 @@
-import { useEffect } from 'react';
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { useEffect, useRef } from 'react';
+import { DndProvider, useDrag } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { motion } from 'framer-motion';
 import clsx from 'clsx';
 import { useGameStore, type Note } from '../../stores/GameStore';
 import { useSoundManager } from '../../hooks/useSoundManager';
@@ -15,7 +14,7 @@ interface NotesBoardProps {
 
 interface DraggableNoteProps {
   note: Note;
-  onMove: (id: string, x: number, y: number) => void;
+  onMove: (id: string, left: number, top: number) => void;
   onConnectStart: (id: string) => void;
   onConnectEnd: (id: string) => void;
   onRemoveConnection: (noteId: string, targetId: string) => void;
@@ -36,43 +35,51 @@ const DraggableNote = ({
   getSourceIcon,
   notes,
 }: DraggableNoteProps) => {
+  const ref = useRef<HTMLDivElement>(null);
+
   const [{ isDragging }, drag] = useDrag({
     type: ItemType,
-    item: () => ({ id: note.id, x: note.position?.x || 0, y: note.position?.y || 0 }),
+    item: () => {
+      const rect = ref.current?.getBoundingClientRect();
+      return {
+        id: note.id,
+        left: note.position?.x || 0,
+        top: note.position?.y || 0,
+        offsetX: rect ? rect.left - (note.position?.x || 0) : 0,
+        offsetY: rect ? rect.top - (note.position?.y || 0) : 0,
+      };
+    },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
-    canDrag: () => !connectingFrom, // Disable drag when connecting
-  });
-
-  const [, drop] = useDrop({
-    accept: ItemType,
-    drop: (item: { id: string; x: number; y: number }, monitor) => {
+    canDrag: () => !connectingFrom,
+    end: (item, monitor) => {
       const delta = monitor.getDifferenceFromInitialOffset();
-      if (delta && note.position) {
-        const newX = Math.max(0, item.x + delta.x);
-        const newY = Math.max(0, item.y + delta.y);
-        onMove(item.id, newX, newY);
+      if (delta) {
+        const left = Math.max(0, Math.round(item.left + delta.x));
+        const top = Math.max(0, Math.round(item.top + delta.y));
+        onMove(item.id, left, top);
       }
     },
   });
+
+  drag(ref);
 
   const isConnecting = connectingFrom === note.id;
 
   return (
     <div
-      ref={(node) => drag(drop(node))}
+      ref={ref}
       className={clsx(
         'absolute w-48 border-2 rounded-lg shadow-lg cursor-move select-none',
-        isDragging && 'opacity-50',
+        isDragging && 'opacity-50 z-50',
         isConnecting && 'border-cyan-500 shadow-cyan-500/50',
         !isDragging && !isConnecting && 'border-green-500/30 hover:border-green-500/50',
-        'bg-black transition-all duration-200'
+        'bg-black transition-colors duration-200'
       )}
       style={{
         left: note.position?.x || 0,
         top: note.position?.y || 0,
-        zIndex: isDragging ? 50 : 10,
       }}
       onClick={(e) => {
         if (connectingFrom && connectingFrom !== note.id) {
@@ -185,9 +192,9 @@ export const NotesBoard = ({ onClose, onSwitchToList }: NotesBoardProps) => {
     });
   }, []);
 
-  const handleMove = (id: string, x: number, y: number) => {
+  const handleMove = (id: string, left: number, top: number) => {
     updateNote(id, {
-      position: { x, y },
+      position: { x: left, y: top },
     });
   };
 
