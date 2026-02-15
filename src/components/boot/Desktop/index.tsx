@@ -142,6 +142,10 @@ export const Desktop = () => {
     setShowDesktop(true);
   };
 
+  const handleShowApp = () => {
+    setShowDesktop(false);
+  };
+
   // Story beats and objectives
   const storyBeats = [
     { text: 'System Status: OPERATIONAL', color: 'text-green-500' },
@@ -195,6 +199,7 @@ export const Desktop = () => {
       {/* Tab Bar */}
       <TabBar
         onDesktopClick={handleShowDesktop}
+        onAppTabClick={handleShowApp}
         isDesktopActive={showDesktop}
       />
 

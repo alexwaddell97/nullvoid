@@ -41,7 +41,7 @@ function App() {
 
     if (bootPhase === 'crt-boot') {
         setTimeout(() => sound.play('crtPowerOn'), 800); // Play power-on sound shortly after CRT effect starts
-        setTimeout(() => sound.play('crtPowerOnLoop'), 9100); 
+        setTimeout(() => sound.play('crtPowerOnLoop'), 9100);
         setTimeout(() => sound.stop('crtPowerOnLoop'), 12500);
       sound.play('staticBurst');
     }
@@ -54,6 +54,17 @@ function App() {
       sound.startAmbient();
     }
   }, [bootPhase, sound]);
+
+  // Disable default browser context menu globally
+  useEffect(() => {
+    const handleContextMenu = (e: MouseEvent) => {
+      // Prevent default browser context menu
+      e.preventDefault();
+    };
+
+    document.addEventListener('contextmenu', handleContextMenu);
+    return () => document.removeEventListener('contextmenu', handleContextMenu);
+  }, []);
 
   return (
     <div className="h-screen w-screen bg-black font-mono overflow-hidden">

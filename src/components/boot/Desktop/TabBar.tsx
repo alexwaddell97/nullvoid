@@ -7,10 +7,11 @@ import { useGameStore } from '../../../stores/GameStore';
 
 interface TabBarProps {
   onDesktopClick: () => void;
+  onAppTabClick?: () => void;
   isDesktopActive: boolean;
 }
 
-export const TabBar = ({ onDesktopClick, isDesktopActive }: TabBarProps) => {
+export const TabBar = ({ onDesktopClick, onAppTabClick, isDesktopActive }: TabBarProps) => {
   const { openWindows, activeWindowId, setActiveWindow, closeWindow } = useWindowManager();
   const [showNotes, setShowNotes] = useState(false);
   const { notes } = useGameStore();
@@ -77,6 +78,8 @@ export const TabBar = ({ onDesktopClick, isDesktopActive }: TabBarProps) => {
     } else if (e.button === 0) {
       // Left click switches to tab
       setActiveWindow(windowId);
+      // Notify parent that an app tab was clicked (to hide desktop)
+      onAppTabClick?.();
     }
   };
 
@@ -87,7 +90,7 @@ export const TabBar = ({ onDesktopClick, isDesktopActive }: TabBarProps) => {
 
   return (
     <>
-      <div className=" backdrop-blur-sm border-b border-green-500/30 overflow-x-auto scrollbar-thin scrollbar-thumb-green-500/30 scrollbar-track-transparent">
+      <div className=" backdrop-blur-sm border-b border-green-500/30 overflow-x-auto">
         <div className="flex items-center gap-1 p-1">
           {/* Desktop/Home tab */}
           <motion.div className="relative flex-shrink-0">

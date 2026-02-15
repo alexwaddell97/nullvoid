@@ -1,1 +1,36 @@
 @import "tailwindcss";
+
+/* Use native system scrollbars */
+* {
+  scrollbar-width: auto;
+  scrollbar-color: auto;
+}
+
+/* Remove any custom webkit scrollbar styling to use system default */
+*::-webkit-scrollbar {
+  width: auto;
+  height: auto;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: auto;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: auto;
+}
+
+/* Use native system text selection colors */
+::selection {
+  background-color: Highlight;
+  color: HighlightText;
+}
+
+::-moz-selection {
+  background-color: Highlight;
+  color: HighlightText;
+}

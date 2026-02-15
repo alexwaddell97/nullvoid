@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { commands, type CommandContext } from '../../data/commands';
 import { useGameStore } from '../../stores/GameStore';
 import { Terminal as TerminalIcon } from 'lucide-react';
+import { SelectionContextMenu } from '../shared/SelectionContextMenu';
 
 interface TerminalProps {
   onClose: () => void;
@@ -181,36 +182,38 @@ export const Terminal = ({ onClose }: TerminalProps) => {
       </div>
 
       {/* Terminal content */}
-      <div 
-        ref={historyRef}
-        className="flex-1 p-4 overflow-auto"
-        onClick={() => inputRef.current?.focus()}
-      >
-        {/* Command history */}
-        <div className="mb-2">
-          {history.map((line, i) => (
-            <div key={i} className="whitespace-pre-wrap leading-relaxed">
-              {line}
-            </div>
-          ))}
+      <SelectionContextMenu source="terminal" sourceName="Terminal Output" category="terminal">
+        <div
+          ref={historyRef}
+          className="flex-1 p-4 overflow-auto"
+          onClick={() => inputRef.current?.focus()}
+        >
+          {/* Command history */}
+          <div className="mb-2">
+            {history.map((line, i) => (
+              <div key={i} className="whitespace-pre-wrap leading-relaxed">
+                {line}
+              </div>
+            ))}
+          </div>
+
+          {/* Input line */}
+          <div className="flex items-center gap-2">
+            <span className="text-green-500 select-none">{getPrompt()}</span>
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="bg-transparent outline-none flex-1 text-green-400 font-mono"
+              spellCheck={false}
+              autoComplete="off"
+            />
+            <span className="animate-pulse text-green-400">▊</span>
+          </div>
         </div>
-        
-        {/* Input line */}
-        <div className="flex items-center gap-2">
-          <span className="text-green-500 select-none">{getPrompt()}</span>
-          <input
-            ref={inputRef}
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="bg-transparent outline-none flex-1 text-green-400 font-mono"
-            spellCheck={false}
-            autoComplete="off"
-          />
-          <span className="animate-pulse text-green-400">▊</span>
-        </div>
-      </div>
+      </SelectionContextMenu>
 
       {/* Terminal footer info */}
       <div className="p-2 border-t border-green-500/30 bg-green-500/5 text-xs text-green-700 flex justify-between">
