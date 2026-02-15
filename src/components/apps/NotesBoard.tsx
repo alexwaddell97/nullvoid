@@ -39,16 +39,11 @@ const DraggableNote = ({
 
   const [{ isDragging }, drag] = useDrag({
     type: ItemType,
-    item: () => {
-      const rect = ref.current?.getBoundingClientRect();
-      return {
-        id: note.id,
-        left: note.position?.x || 0,
-        top: note.position?.y || 0,
-        offsetX: rect ? rect.left - (note.position?.x || 0) : 0,
-        offsetY: rect ? rect.top - (note.position?.y || 0) : 0,
-      };
-    },
+    item: () => ({
+      id: note.id,
+      left: note.position?.x || 0,
+      top: note.position?.y || 0,
+    }),
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -71,8 +66,8 @@ const DraggableNote = ({
     <div
       ref={ref}
       className={clsx(
-        'absolute w-48 border-2 rounded-lg shadow-lg cursor-move select-none',
-        isDragging && 'opacity-50 z-50',
+        'absolute w-48 border-2 rounded-lg shadow-lg select-none',
+        isDragging ? 'opacity-50 cursor-grabbing' : 'cursor-grab',
         isConnecting && 'border-cyan-500 shadow-cyan-500/50',
         !isDragging && !isConnecting && 'border-green-500/30 hover:border-green-500/50',
         'bg-black transition-colors duration-200'
@@ -80,6 +75,7 @@ const DraggableNote = ({
       style={{
         left: note.position?.x || 0,
         top: note.position?.y || 0,
+        zIndex: isDragging ? 1000 : 'auto',
       }}
       onClick={(e) => {
         if (connectingFrom && connectingFrom !== note.id) {
