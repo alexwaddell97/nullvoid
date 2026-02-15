@@ -7,6 +7,8 @@ export interface OpenWindow {
   title: string;     // Display name in tab
   icon: string;      // Emoji icon for tab
   timestamp: number; // When window was opened (for ordering)
+  hasNotification?: boolean; // Whether this tab has an unread notification
+  notificationCount?: number; // Number of unread items
 }
 
 interface WindowManagerState {
@@ -23,6 +25,8 @@ interface WindowManagerState {
   closeAllWindows: () => void;
   isAppOpen: (appId: string) => boolean;
   getActiveApp: () => string | null;
+  setNotification: (appId: string, count?: number) => void;
+  clearNotification: (appId: string) => void;
 }
 
 export const useWindowManager = create<WindowManagerState>()(
@@ -108,6 +112,26 @@ export const useWindowManager = create<WindowManagerState>()(
         if (!state.activeWindowId) return null;
         const window = state.openWindows.find(w => w.id === state.activeWindowId);
         return window?.appId || null;
+      },
+
+      setNotification: (appId: string, count?: number) => {
+        const state = get();
+        const updatedWindows = state.openWindows.map(w =>
+          w.appId === appId
+            ? { ...w, hasNotification: true, notificationCount: count }
+            : w
+        );
+        set({ openWindows: updatedWindows });
+      },
+
+      clearNotification: (appId: string) => {
+        const state = get();
+        const updatedWindows = state.openWindows.map(w =>
+          w.appId === appId
+            ? { ...w, hasNotification: false, notificationCount: undefined }
+            : w
+        );
+        set({ openWindows: updatedWindows });
       },
     }),
     {

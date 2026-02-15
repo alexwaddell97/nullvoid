@@ -1,23 +1,26 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
 import { useGameStore, type Note } from '../../stores/GameStore';
 import { useSoundManager } from '../../hooks/useSoundManager';
-import { StickyNote, Mail, Folder, FileText, Link as LinkIcon, X } from 'lucide-react';
+import { StickyNote, Mail, Folder, FileText, Link as LinkIcon, X, List } from 'lucide-react';
 
 interface NotesBoardProps {
   onClose: () => void;
+  onSwitchToList?: () => void;
 }
 
-export const NotesBoard = ({ onClose }: NotesBoardProps) => {
+export const NotesBoard = ({ onClose, onSwitchToList }: NotesBoardProps) => {
   const { notes, updateNote } = useGameStore();
   const sound = useSoundManager();
   const boardRef = useRef<HTMLDivElement>(null);
 
   const [draggingNote, setDraggingNote] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [tempPosition, setTempPosition] = useState<{ x: number; y: number } | null>(null);
   const [connectingFrom, setConnectingFrom] = useState<string | null>(null);
   const [hoveredNote, setHoveredNote] = useState<string | null>(null);
+  const rafRef = useRef<number | null>(null);
 
   // Initialize positions for notes that don't have them
   useEffect(() => {
@@ -33,38 +36,70 @@ export const NotesBoard = ({ onClose }: NotesBoardProps) => {
     });
   }, []);
 
-  const handleMouseDown = (noteId: string, e: React.MouseEvent) => {
+  const handleMouseDown = useCallback((noteId: string, e: React.MouseEvent) => {
     if (connectingFrom) return; // Don't drag while connecting
 
     const note = notes.find(n => n.id === noteId);
     if (!note?.position) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
+    const boardRect = boardRef.current?.getBoundingClientRect();
+    if (!boardRect) return;
+
     setDragOffset({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     });
     setDraggingNote(noteId);
-  };
+    setTempPosition(note.position);
+  }, [connectingFrom, notes]);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!draggingNote || !boardRef.current) return;
 
-    const boardRect = boardRef.current.getBoundingClientRect();
-    const note = notes.find(n => n.id === draggingNote);
-    if (!note) return;
+    // Cancel any pending RAF
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+    }
 
-    const newX = e.clientX - boardRect.left - dragOffset.x;
-    const newY = e.clientY - boardRect.top - dragOffset.y;
+    // Use RAF to throttle updates
+    rafRef.current = requestAnimationFrame(() => {
+      const boardRect = boardRef.current?.getBoundingClientRect();
+      if (!boardRect) return;
 
-    updateNote(draggingNote, {
-      position: { x: Math.max(0, newX), y: Math.max(0, newY) },
+      const newX = e.clientX - boardRect.left - dragOffset.x;
+      const newY = e.clientY - boardRect.top - dragOffset.y;
+
+      setTempPosition({
+        x: Math.max(0, newX),
+        y: Math.max(0, newY),
+      });
     });
-  };
+  }, [draggingNote, dragOffset]);
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
+    if (draggingNote && tempPosition) {
+      // Only update the store once at the end
+      updateNote(draggingNote, {
+        position: tempPosition,
+      });
+    }
     setDraggingNote(null);
-  };
+    setTempPosition(null);
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+  }, [draggingNote, tempPosition, updateNote]);
+
+  // Cleanup RAF on unmount
+  useEffect(() => {
+    return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, []);
 
   const handleConnectStart = (noteId: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -167,6 +202,16 @@ export const NotesBoard = ({ onClose }: NotesBoardProps) => {
           <div className="text-xs text-green-700">
             {connectingFrom ? 'Click a note to connect...' : 'Drag to move • Click link to connect'}
           </div>
+          {onSwitchToList && (
+            <button
+              onClick={onSwitchToList}
+              className="text-cyan-500 hover:text-cyan-400 text-sm px-2 py-1 border border-cyan-500/30 hover:border-cyan-500/50 transition-colors flex items-center gap-1"
+              title="Switch to list view"
+            >
+              <List size={14} />
+              <span className="hidden sm:inline">LIST</span>
+            </button>
+          )}
           <button
             onClick={onClose}
             className="text-red-500 hover:text-red-400 text-sm px-2 py-1 border border-red-500/30 hover:border-red-500/50 transition-colors"
@@ -206,6 +251,9 @@ export const NotesBoard = ({ onClose }: NotesBoardProps) => {
             const isConnecting = connectingFrom === note.id;
             const isHovered = hoveredNote === note.id;
 
+            // Use temp position if currently dragging this note
+            const displayPosition = isBeingDragged && tempPosition ? tempPosition : note.position;
+
             return (
               <motion.div
                 key={note.id}
@@ -217,8 +265,8 @@ export const NotesBoard = ({ onClose }: NotesBoardProps) => {
                   'bg-black transition-all duration-200'
                 )}
                 style={{
-                  left: note.position.x,
-                  top: note.position.y,
+                  left: displayPosition.x,
+                  top: displayPosition.y,
                   zIndex: isBeingDragged ? 50 : 10,
                 }}
                 onMouseDown={(e) => handleMouseDown(note.id, e)}

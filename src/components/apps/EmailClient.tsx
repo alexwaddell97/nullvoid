@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { emails, type Email, type Attachment } from '../../data/emails';
 import { useSoundManager } from '../../hooks/useSoundManager';
 import { useGameStore } from '../../stores/GameStore';
+import { useWindowManager } from '../../stores/WindowManager';
 import { SelectionContextMenu } from '../shared/SelectionContextMenu';
 import { Mail, File, FileText, Image, Paperclip } from 'lucide-react';
 
@@ -22,6 +23,8 @@ export const EmailClient = ({ onClose }: EmailClientProps) => {
     //unreadEmailCount,
   } = useGameStore();
 
+  const { setNotification, clearNotification } = useWindowManager();
+
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
   const [selectedAttachment, setSelectedAttachment] = useState<Attachment | null>(null);
  const [emailList, setEmailList] = useState<Email[]>(
@@ -34,6 +37,20 @@ export const EmailClient = ({ onClose }: EmailClientProps) => {
   const [sortType, setSortType] = useState<SortType>('date-desc');
   const [searchQuery, setSearchQuery] = useState('');
   const sound = useSoundManager();
+
+  // Set notification on mount if there are unread emails
+  useEffect(() => {
+    const unreadCount = emailList.filter(e => !e.read).length;
+    if (unreadCount > 0) {
+      setNotification('email', unreadCount);
+      // Play notification sound
+      sound.play('appHover');
+    }
+    // Clear notification when component unmounts (user viewed the emails)
+    return () => {
+      clearNotification('email');
+    };
+  }, []);
 
   // Handle ESC key to close modal
   useEffect(() => {
