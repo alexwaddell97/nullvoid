@@ -385,7 +385,7 @@ export const Notes = ({ onClose }: NotesProps) => {
                       onChange={(e) => setFormContent(e.target.value)}
                       placeholder="Note content..."
                       rows={12}
-                      className="w-full bg-black border border-green-500/30 px-3 py-2 text-sm text-green-400 placeholder-green-800 outline-none focus:border-green-500/50 resize-none"
+                      className="w-full bg-black border border-green-500/30 px-3 py-2 text-sm text-green-400 placeholder-green-800 outline-none focus:border-green-500/50 resize-none break-all"
                     />
                   </div>
 
@@ -445,7 +445,7 @@ export const Notes = ({ onClose }: NotesProps) => {
                 {/* Note header */}
                 <div className="mb-6 pb-4 border-b border-green-500/20">
                   <div className="flex items-start justify-between mb-3">
-                    <h2 className="text-xl font-semibold text-green-300">
+                    <h2 className="text-xl font-semibold text-green-300 break-all">
                       {selectedNote.title}
                     </h2>
                     <span className="text-2xl">{getSourceIcon(selectedNote.source)}</span>
@@ -459,7 +459,7 @@ export const Notes = ({ onClose }: NotesProps) => {
                     {selectedNote.sourceName && (
                       <div className="flex gap-2">
                         <span className="text-green-700 w-20">From:</span>
-                        <span className="text-green-300 font-semibold">"{selectedNote.sourceName}"</span>
+                        <span className="text-green-300 font-semibold break-all">"{selectedNote.sourceName}"</span>
                       </div>
                     )}
                     <div className="flex gap-2">
@@ -493,7 +493,7 @@ export const Notes = ({ onClose }: NotesProps) => {
                 </div>
 
                 {/* Note content */}
-                <div className="text-sm text-green-400 whitespace-pre-wrap leading-relaxed mb-6">
+                <div className="text-sm text-green-400 whitespace-pre-wrap break-all leading-relaxed mb-6">
                   {selectedNote.content}
                 </div>
 

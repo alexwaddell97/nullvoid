@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { DndProvider, useDrag, useDrop, type XYCoord } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import clsx from 'clsx';
 import { useGameStore, type Note } from '../../stores/GameStore';
 
-import { StickyNote, Mail, Folder, FileText, Link as LinkIcon, X, List, ZoomIn, ZoomOut } from 'lucide-react';
+import { StickyNote, Mail, Folder, FileText, Link as LinkIcon, X, List, ZoomIn, ZoomOut, LoaderCircle } from 'lucide-react';
 
 interface NotesBoardProps {
   onClose: () => void;
@@ -23,10 +23,12 @@ interface DraggableNoteProps {
   onConnectEnd: (id: string) => void;
   onRemoveConnection: (noteId: string, targetId: string) => void;
   onResize: (id: string, width: number, height: number) => void;
+  onBringToFront: (id: string) => void;
   connectingFrom: string | null;
   getSourceIcon: (source?: string, size?: number) => React.ReactElement;
   notes: Note[];
   zoom: number;
+  zIndex: number;
 }
 
 const ItemType = 'NOTE';
@@ -46,10 +48,12 @@ const DraggableNote = ({
   onConnectEnd,
   onRemoveConnection,
   onResize,
+  onBringToFront,
   connectingFrom,
   getSourceIcon,
   notes,
   zoom,
+  zIndex,
 }: DraggableNoteProps) => {
   const [isResizing, setIsResizing] = useState(false);
 
@@ -137,8 +141,9 @@ const DraggableNote = ({
         top: note.position?.y ?? 0,
         width: noteWidth,
         height: noteHeight,
-        zIndex: isDragging ? 1000 : 2,
+        zIndex: isDragging ? 2000 : zIndex,
       }}
+      onMouseDown={() => onBringToFront(note.id)}
       onClick={(e) => {
         if (connectingFrom && connectingFrom !== note.id) {
           e.stopPropagation();
@@ -259,8 +264,10 @@ const BOARD_CENTER = BOARD_SIZE / 2;
 const NotesBoardInner = ({ onClose, onSwitchToList }: NotesBoardProps) => {
   const { notes, updateNote } = useGameStore();
   const [connectingFrom, setConnectingFrom] = useState<string | null>(null);
+  const [isDndInitializing, setIsDndInitializing] = useState(true);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: -BOARD_CENTER, y: -BOARD_CENTER });
+  const [noteStack, setNoteStack] = useState<string[]>([]);
   const zoomTargetRef = useRef(1);
   const zoomAnimRef = useRef<number | null>(null);
   const isPanningRef = useRef(false);
@@ -270,6 +277,20 @@ const NotesBoardInner = ({ onClose, onSwitchToList }: NotesBoardProps) => {
 
   const boardDivRef = useRef<HTMLDivElement | null>(null);
   const rafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const frameId = requestAnimationFrame(() => setIsDndInitializing(false));
+    return () => cancelAnimationFrame(frameId);
+  }, []);
+
+  useEffect(() => {
+    setNoteStack((prev) => {
+      const currentIds = notes.map((note) => note.id);
+      const existing = prev.filter((id) => currentIds.includes(id));
+      const missing = currentIds.filter((id) => !existing.includes(id));
+      return [...existing, ...missing];
+    });
+  }, [notes]);
 
   useEffect(() => {
     notes.forEach((note, index) => {
@@ -359,6 +380,14 @@ const NotesBoardInner = ({ onClose, onSwitchToList }: NotesBoardProps) => {
     [updateNote]
   );
 
+  const bringNoteToFront = useCallback((id: string) => {
+    setNoteStack((prev) => {
+      if (prev[prev.length - 1] === id) return prev;
+      const without = prev.filter((noteId) => noteId !== id);
+      return [...without, id];
+    });
+  }, []);
+
   const clamp = useCallback((left: number, top: number) => {
     return {
       left: Math.max(0, Math.round(left)),
@@ -399,8 +428,16 @@ const NotesBoardInner = ({ onClose, onSwitchToList }: NotesBoardProps) => {
 
       const { left, top } = computeBoardRelative(item, client);
       moveNote(item.id, left, top);
+      bringNoteToFront(item.id);
     },
   });
+
+  const orderedNotes = useMemo(() => {
+    const noteById = new Map(notes.map((note) => [note.id, note]));
+    return noteStack
+      .map((id) => noteById.get(id))
+      .filter((note): note is Note => Boolean(note));
+  }, [notes, noteStack]);
 
   const setBoardRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -635,7 +672,7 @@ const NotesBoardInner = ({ onClose, onSwitchToList }: NotesBoardProps) => {
           </svg>
 
           {notes.length === 0 ? null : (
-            notes.map((note) => (
+            orderedNotes.map((note, index) => (
               <DraggableNote
                 key={note.id}
                 note={note}
@@ -643,10 +680,12 @@ const NotesBoardInner = ({ onClose, onSwitchToList }: NotesBoardProps) => {
                 onConnectEnd={handleConnectEnd}
                 onRemoveConnection={handleRemoveConnection}
                 onResize={resizeNote}
+                onBringToFront={bringNoteToFront}
                 connectingFrom={connectingFrom}
                 getSourceIcon={getSourceIcon}
                 notes={notes}
                 zoom={zoom}
+                zIndex={index + 2}
               />
             ))
           )}
@@ -658,6 +697,15 @@ const NotesBoardInner = ({ onClose, onSwitchToList }: NotesBoardProps) => {
               <StickyNote size={64} className="mx-auto mb-4 opacity-30" />
               <div className="text-lg mb-2">No notes yet</div>
               <div className="text-xs">Create notes from emails, files, and logs</div>
+            </div>
+          </div>
+        )}
+
+        {isDndInitializing && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/80">
+            <div className="flex items-center gap-2 text-green-400 text-xs tracking-wide">
+              <LoaderCircle size={18} className="animate-spin" />
+              <span>Initializing board...</span>
             </div>
           </div>
         )}

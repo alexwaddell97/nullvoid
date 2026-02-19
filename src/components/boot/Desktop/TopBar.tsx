@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { Save } from 'lucide-react';
-import { ConfirmModal } from '../../shared/ConfirmModal';
 import { useGameStore } from '../../../stores/GameStore';
 // adjust import path if needed
 

@@ -1,10 +1,9 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWindowManager } from '../../../stores/WindowManager';
-import { X, Home, Folder, Terminal, Globe, FileText, Unlock, Archive, Mail, Microscope, Settings, StickyNote, Bell } from 'lucide-react';
+import { X, Home, Folder, Terminal, Globe, FileText, Unlock, Archive, Mail, Microscope, Settings, StickyNote } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { NotesModal } from '../../apps/NotesModal';
 import { useGameStore } from '../../../stores/GameStore';
-import { useSoundManager } from '../../../hooks/useSoundManager';
 
 interface TabBarProps {
   onDesktopClick: () => void;
@@ -16,7 +15,6 @@ export const TabBar = ({ onDesktopClick, onAppTabClick, isDesktopActive }: TabBa
   const { openWindows, activeWindowId, setActiveWindow, closeWindow, clearNotification } = useWindowManager();
   const [showNotes, setShowNotes] = useState(false);
   const { notes } = useGameStore();
-  const sound = useSoundManager();
 
   // Helper function to get icon component by appId
   const getIconComponent = (appId: string) => {
